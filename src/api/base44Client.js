@@ -78,12 +78,14 @@ export const base44 = {
     auth: {
         me: async () => {
             const token = localStorage.getItem('auth_token');
+            console.log('DEBUG: Sending me() request with token:', token ? 'Exists' : 'MISSING');
             const res = await fetch(`${API_URL}/auth/me`, {
                 headers: { 
                     'Authorization': token ? `Bearer ${token}` : '',
                     'Content-Type': 'application/json' 
                 }
             });
+            if (!res.ok) throw new Error('Falha na autenticação');
             return await res.json();
         },
         updateMe: async (data) => {
