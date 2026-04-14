@@ -1,16 +1,23 @@
-# React + Vite
+# 🏋️ HardRock - Sistema de Gestão de Ginásio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este projeto consiste no desenvolvimento de uma aplicação web completa para gestão de ginásio integrada com um sistema de venda de produtos (e-commerce), permitindo a administração eficiente de serviços, utilizadores e vendas numa única plataforma.
 
-Currently, two official plugins are available:
+## 🚀 Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Gestão de utilizadores (Admin, Staff, Clientes)
+- Sistema de autenticação (login e registo)
+- Venda de produtos (loja online)
+- Gestão de serviços do ginásio (planos, mensalidades)
+- Sistema de permissões baseado em roles
+- Envio de emails (Brevo)
 
-## React Compiler
+## 🛠️ Tecnologias
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js
+- Express
+- React + Vite
+- Base de dados (configurável)
 
-## Expanding the ESLint configuration
+## 📌 Estado
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🚧 Em desenvolvimento
