@@ -1,5 +1,5 @@
 // Custom Local Wrapper replacing @base44/sdk
-const API_URL = '/api';
+const API_URL = 'http://127.0.0.1:8000/api';
 
 const modelMap = {
     Product: 'products',
@@ -77,13 +77,23 @@ export const base44 = {
     },
     auth: {
         me: async () => {
-            const res = await fetch(`${API_URL}/auth/me`);
+            const token = localStorage.getItem('auth_token');
+            const res = await fetch(`${API_URL}/auth/me`, {
+                headers: { 
+                    'Authorization': token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json' 
+                }
+            });
             return await res.json();
         },
         updateMe: async (data) => {
+            const token = localStorage.getItem('auth_token');
             const res = await fetch(`${API_URL}/auth/me`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Authorization': token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify(data)
             });
             return await res.json();
@@ -118,8 +128,12 @@ export const base44 = {
             UploadFile: async ({ file }) => {
                 const formData = new FormData();
                 formData.append('file', file);
+                const token = localStorage.getItem('auth_token');
                 const res = await fetch(`${API_URL}/upload`, {
                     method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
                     body: formData
                 });
                 if (!res.ok) throw new Error('Falha ao enviar arquivo');

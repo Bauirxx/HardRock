@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
             // First, check app public settings (with token if available)
             // This will tell us if auth is required, user not registered, etc.
             const appClient = createAxiosClient({
-                baseURL: `/api/apps/public`,
+                baseURL: `http://127.0.0.1:8000/api/apps/public`,
                 headers: {
                     'X-App-Id': appParams.appId
                 },
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
             const role = urlParams.get('role');
             
             const currentUser = await (role ? 
-                fetch(`http://127.0.0.1:5000/api/auth/me?role=${role}`).then(r => r.json()) : 
+                fetch(`http://127.0.0.1:8000/api/auth/me?role=${role}`).then(r => r.json()) : 
                 base44.auth.me()
             );
 
