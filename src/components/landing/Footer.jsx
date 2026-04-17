@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import { Dumbbell, MapPin, Clock, Phone, Mail, Instagram, Facebook, MessageCircle } from 'lucide-react';
 
 // Inline X (Twitter) icon — Lucide has no official "X" yet.
@@ -30,19 +31,35 @@ const socials = [
 export default function Footer() {
     return (
         <footer className="bg-sidebar text-sidebar-foreground">
+=======
+import { Dumbbell, MapPin, Clock, Phone, Mail, Instagram } from 'lucide-react';
+
+export default function Footer() {
+    return (
+        <footer className="bg-foreground text-background">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     <div>
                         <div className="flex items-center gap-2 mb-4">
+<<<<<<< HEAD
                             <div className="w-10 h-10 rounded-xl brand-gradient flex items-center justify-center shadow-lg shadow-primary/30">
                                 <Dumbbell className="w-5 h-5 text-white" />
+=======
+                            <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border border-primary">
+                                <Dumbbell className="w-5 h-5 text-primary" />
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                             </div>
                             <span className="font-space font-bold text-xl uppercase tracking-tighter italic">
                                 <span className="text-primary">Hard Rock</span>{' '}
                                 <span>Gym</span>
                             </span>
                         </div>
+<<<<<<< HEAD
                         <p className="text-sm text-sidebar-foreground/70 leading-relaxed">
+=======
+                        <p className="text-sm text-background/60 leading-relaxed">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                             O seu parceiro na jornada de transformação física e mental.
                             Equipamento de ponta e profissionais dedicados.
                         </p>
@@ -50,7 +67,11 @@ export default function Footer() {
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Links Rápidos</h4>
+<<<<<<< HEAD
                         <div className="space-y-2 text-sm text-sidebar-foreground/70">
+=======
+                        <div className="space-y-2 text-sm text-background/60">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                             <Link to="/loja" className="block hover:text-primary transition-colors">Loja</Link>
                             <Link to="/equipamentos" className="block hover:text-primary transition-colors">Equipamentos</Link>
                             <Link to="/cliente" className="block hover:text-primary transition-colors">Área do Cliente</Link>
@@ -60,6 +81,7 @@ export default function Footer() {
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Contacto</h4>
+<<<<<<< HEAD
                         <div className="space-y-3 text-sm text-sidebar-foreground/70">
                             <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-primary shrink-0" />
@@ -73,14 +95,35 @@ export default function Footer() {
                                 <Mail className="w-4 h-4 text-primary shrink-0" />
                                 <span>{CONTACTS.email}</span>
                             </a>
+=======
+                        <div className="space-y-3 text-sm text-background/60">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                                <span>Av. 24 de Julho, Maputo</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4 text-primary shrink-0" />
+                                <span>+258 84 000 0000</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Mail className="w-4 h-4 text-primary shrink-0" />
+                                <span>info@fitgym.co.mz</span>
+                            </div>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                         </div>
                     </div>
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Horário</h4>
+<<<<<<< HEAD
                         <div className="space-y-2 text-sm text-sidebar-foreground/70">
                             <div className="flex items-start gap-2">
                                 <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+=======
+                        <div className="space-y-2 text-sm text-background/60">
+                            <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-primary shrink-0" />
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                 <div>
                                     <p>Seg - Sex: 06h - 22h</p>
                                     <p>Sáb: 08h - 18h</p>
@@ -91,6 +134,7 @@ export default function Footer() {
                     </div>
                 </div>
 
+<<<<<<< HEAD
                 <div className="border-t border-sidebar-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-sidebar-foreground/50">
                         © {new Date().getFullYear()} Hard Rock Gym. Todos os direitos reservados.
@@ -108,9 +152,23 @@ export default function Footer() {
                                 <Icon className="w-4 h-4" />
                             </a>
                         ))}
+=======
+                <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-sm text-background/40">
+                        © {new Date().getFullYear()} Lárius Sport. Todos os direitos reservados.
+                    </p>
+                    <div className="flex items-center gap-3">
+                        <a href="#" className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <Instagram className="w-4 h-4" />
+                        </a>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                     </div>
                 </div>
             </div>
         </footer>
     );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3

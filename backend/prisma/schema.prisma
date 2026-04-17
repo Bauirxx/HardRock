@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model clients {
+  id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date         DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_date         DateTime?  @default(now()) @db.Timestamptz(6)
+  created_by           String?    @db.VarChar(255)
+  tenant_id            String     @db.Uuid
+  nome                 String     @db.VarChar(255)
+  email                String     @db.VarChar(255)
+  telefone             String     @db.VarChar(50)
+  bi_numero            String?    @db.VarChar(50)
+  data_nascimento      DateTime?  @db.Date
+  endereco             String?
+  foto_url             String?
+  status               String?    @default("pending") @db.VarChar(20)
+  servicos_contratados Json?      @default("[]")
+  contato_emergencia   Json?      @default("{}")
+  notas                String?
+  tenants              tenants    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  orders               orders[]
+  payments             payments[]
+
+  @@index([email], map: "idx_clients_email")
+  @@index([status], map: "idx_clients_status")
+  @@index([tenant_id], map: "idx_clients_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model leads {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date DateTime? @default(now()) @db.Timestamptz(6)
+  updated_date DateTime? @default(now()) @db.Timestamptz(6)
+  created_by   String?   @db.VarChar(255)
+  tenant_id    String    @db.Uuid
+  nome         String    @db.VarChar(255)
+  email        String?   @db.VarChar(255)
+  telefone     String    @db.VarChar(50)
+  interesse    String?   @db.VarChar(255)
+  mensagem     String?
+  status       String?   @default("new") @db.VarChar(20)
+  notas        String?
+  fonte        String?   @default("landing_page") @db.VarChar(30)
+  tenants      tenants   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status], map: "idx_leads_status")
+  @@index([tenant_id], map: "idx_leads_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model orders {
+  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date      DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_date      DateTime?  @default(now()) @db.Timestamptz(6)
+  created_by        String?    @db.VarChar(255)
+  tenant_id         String     @db.Uuid
+  client_id         String?    @db.Uuid
+  guest_name        String?    @db.VarChar(255)
+  guest_email       String?    @db.VarChar(255)
+  guest_phone       String?    @db.VarChar(50)
+  endereco_entrega  Json?      @default("{}")
+  items             Json       @default("[]")
+  subtotal          Decimal?   @db.Decimal(10, 2)
+  taxa_entrega      Decimal?   @default(0) @db.Decimal(10, 2)
+  desconto          Decimal?   @default(0) @db.Decimal(10, 2)
+  total             Decimal    @db.Decimal(10, 2)
+  metodo_pagamento  String?    @db.VarChar(20)
+  status_pagamento  String?    @default("pending") @db.VarChar(20)
+  status            String?    @default("pending") @db.VarChar(20)
+  tracking_code     String?    @unique @db.VarChar(50)
+  tracking_url      String?
+  notas             String?
+  payment_reference String?    @db.VarChar(255)
+  clients           clients?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenants           tenants    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  payments          payments[]
+
+  @@index([client_id], map: "idx_orders_client")
+  @@index([status], map: "idx_orders_status")
+  @@index([tenant_id], map: "idx_orders_tenant")
+  @@index([tracking_code], map: "idx_orders_tracking")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model payments {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date       DateTime? @default(now()) @db.Timestamptz(6)
+  updated_date       DateTime? @default(now()) @db.Timestamptz(6)
+  created_by         String?   @db.VarChar(255)
+  tenant_id          String    @db.Uuid
+  client_id          String?   @db.Uuid
+  order_id           String?   @db.Uuid
+  tipo               String    @db.VarChar(20)
+  descricao          String?
+  valor              Decimal   @db.Decimal(10, 2)
+  metodo             String?   @db.VarChar(20)
+  status             String?   @default("pending") @db.VarChar(20)
+  referencia_externa String?   @db.VarChar(255)
+  data_pagamento     DateTime? @db.Timestamptz(6)
+  recibo_url         String?
+  periodo_referencia String?   @db.VarChar(20)
+  clients            clients?  @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders             orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenants            tenants   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([client_id], map: "idx_payments_client")
+  @@index([order_id], map: "idx_payments_order")
+  @@index([status], map: "idx_payments_status")
+  @@index([tenant_id], map: "idx_payments_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model products {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date      DateTime? @default(now()) @db.Timestamptz(6)
+  updated_date      DateTime? @default(now()) @db.Timestamptz(6)
+  created_by        String?   @db.VarChar(255)
+  tenant_id         String    @db.Uuid
+  nome              String    @db.VarChar(255)
+  descricao         String?
+  preco             Decimal   @db.Decimal(10, 2)
+  preco_promocional Decimal?  @db.Decimal(10, 2)
+  tipo              String    @db.VarChar(50)
+  categoria         String?   @db.VarChar(100)
+  is_machine        Boolean?  @default(false)
+  ficha_tecnica     Json?     @default("{}")
+  stock_quantidade  Int?      @default(0)
+  sku               String?   @db.VarChar(100)
+  imagens           Json?     @default("[]")
+  status            String?   @default("active") @db.VarChar(20)
+  sob_consulta      Boolean?  @default(false)
+  destaque          Boolean?  @default(false)
+  tenants           tenants   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([destaque], map: "idx_products_destaque")
+  @@index([is_machine], map: "idx_products_is_machine")
+  @@index([status], map: "idx_products_status")
+  @@index([tenant_id], map: "idx_products_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model services {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date      DateTime? @default(now()) @db.Timestamptz(6)
+  updated_date      DateTime? @default(now()) @db.Timestamptz(6)
+  created_by        String?   @db.VarChar(255)
+  tenant_id         String    @db.Uuid
+  nome              String    @db.VarChar(255)
+  descricao         String?
+  preco_mensal      Decimal   @db.Decimal(10, 2)
+  preco_trimestral  Decimal?  @db.Decimal(10, 2)
+  preco_anual       Decimal?  @db.Decimal(10, 2)
+  duracao_sessao    Int?
+  max_participantes Int?
+  horarios          Json?     @default("[]")
+  imagem_url        String?
+  status            String?   @default("active") @db.VarChar(20)
+  destaque          Boolean?  @default(false)
+  tenants           tenants   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status], map: "idx_services_status")
+  @@index([tenant_id], map: "idx_services_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model tenants {
+  id                    String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date          DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_date          DateTime?      @default(now()) @db.Timestamptz(6)
+  created_by            String?        @db.VarChar(255)
+  nome                  String         @db.VarChar(255)
+  subdominio            String         @unique @db.VarChar(100)
+  status                String?        @default("active") @db.VarChar(20)
+  logo_url              String?
+  primary_color         String?        @default("#DC2626") @db.VarChar(20)
+  secondary_color       String?        @default("#000000") @db.VarChar(20)
+  whatsapp_number       String?        @db.VarChar(50)
+  google_maps_embed     String?
+  endereco              String?
+  horario_funcionamento String?        @default("Seg-Sex 6h-22h, Sáb 8h-18h") @db.VarChar(255)
+  email_notificacao     String?        @db.VarChar(255)
+  telefone              String?        @db.VarChar(50)
+  descricao             String?
+  banners               Json?          @default("[]")
+  redes_sociais         Json?          @default("{}")
+  videos_youtube        Json?          @default("[]")
+  clients               clients[]
+  leads                 leads[]
+  orders                orders[]
+  payments              payments[]
+  products              products[]
+  services              services[]
+  testimonials          testimonials[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model testimonials {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date DateTime? @default(now()) @db.Timestamptz(6)
+  updated_date DateTime? @default(now()) @db.Timestamptz(6)
+  created_by   String?   @db.VarChar(255)
+  tenant_id    String    @db.Uuid
+  nome         String    @db.VarChar(255)
+  texto        String
+  stars        Int?      @default(5)
+  foto_url     String?
+  status       String?   @default("pending") @db.VarChar(20)
+  tenants      tenants   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status], map: "idx_testimonials_status")
+  @@index([tenant_id], map: "idx_testimonials_tenant")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_date DateTime? @default(now()) @db.Timestamptz(6)
+  full_name    String?   @db.VarChar(255)
+  email        String    @unique @db.VarChar(255)
+  password     String?   @db.VarChar(255)
+  role         String?   @default("user") @db.VarChar(50)
+}

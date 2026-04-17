@@ -9,15 +9,25 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+<<<<<<< HEAD
 import { Search, Plus, Package, Edit, Trash2, Upload, X, Youtube } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentTenantId } from '@/lib/tenantStore';
 import { getYouTubeId } from '@/lib/youtube';
+=======
+import { Search, Plus, Package, Edit, Trash2, Upload, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { getCurrentTenantId } from '@/lib/tenantStore';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 const emptyForm = {
     nome: '', descricao: '', preco: '', preco_promocional: '', tipo: 'supplement',
     is_machine: false, stock_quantidade: '', sku: '', status: 'active',
+<<<<<<< HEAD
     sob_consulta: false, destaque: false, categoria: '', imagens: [], youtube_url: '',
+=======
+    sob_consulta: false, destaque: false, categoria: '', imagens: [],
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 };
 
 export default function AdminProducts() {
@@ -81,7 +91,11 @@ export default function AdminProducts() {
             stock_quantidade: product.stock_quantidade?.toString() || '', sku: product.sku || '',
             status: product.status || 'active', sob_consulta: product.sob_consulta || false,
             destaque: product.destaque || false, categoria: product.categoria || '',
+<<<<<<< HEAD
             imagens: product.imagens || [], youtube_url: product.youtube_url || '',
+=======
+            imagens: product.imagens || [],
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         });
         setDialogOpen(true);
     };
@@ -140,6 +154,7 @@ export default function AdminProducts() {
                                 <div className="flex items-center gap-2"><Switch checked={form.destaque} onCheckedChange={v => setForm({ ...form, destaque: v })} /><Label>Destaque</Label></div>
                             </div>
                             <div>
+<<<<<<< HEAD
                                 <Label className="flex items-center gap-2"><Youtube className="w-4 h-4 text-red-500" /> Vídeo do YouTube (opcional)</Label>
                                 <Input
                                     placeholder="https://youtube.com/watch?v=..."
@@ -154,6 +169,8 @@ export default function AdminProducts() {
                                 )}
                             </div>
                             <div>
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                 <Label>Imagens do Produto</Label>
                                 <div className="flex flex-wrap gap-2 mt-2 mb-2">
                                     {(form.imagens || []).map((img, idx) => (

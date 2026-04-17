@@ -1,6 +1,10 @@
 // Custom Local Wrapper replacing @base44/sdk
+<<<<<<< HEAD
 // Use relative path so Vite proxy can handle it
 const API_URL = '/api';
+=======
+const API_URL = 'http://127.0.0.1:8000/api';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 const modelMap = {
     Product: 'products',
@@ -79,6 +83,7 @@ export const base44 = {
     auth: {
         me: async () => {
             const token = localStorage.getItem('auth_token');
+<<<<<<< HEAD
             const res = await fetch(`${API_URL}/auth/me`, {
                 headers: {
                     'Authorization': token ? `Bearer ${token}` : '',
@@ -88,6 +93,16 @@ export const base44 = {
             if (!res.ok) {
                 throw new Error('Não autenticado');
             }
+=======
+            console.log('DEBUG: Sending me() request with token:', token ? 'Exists' : 'MISSING');
+            const res = await fetch(`${API_URL}/auth/me`, {
+                headers: { 
+                    'Authorization': token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json' 
+                }
+            });
+            if (!res.ok) throw new Error('Falha na autenticação');
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             return await res.json();
         },
         updateMe: async (data) => {
@@ -114,6 +129,7 @@ export const base44 = {
             }
             return data;
         },
+<<<<<<< HEAD
         register: async ({ full_name, email, password, genero, idade }) => {
             try {
                 const res = await fetch(`${API_URL}/auth/register`, {
@@ -170,6 +186,8 @@ export const base44 = {
             console.info('[register mock] new verification code for', email, '=', code);
             return { sent: true, mock: true };
         },
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         redirectToLogin: (returnUrl) => {
             const path = returnUrl ? `?return_url=${encodeURIComponent(returnUrl)}` : '';
             window.location.href = `/login${path}`;
@@ -181,6 +199,7 @@ export const base44 = {
             } else {
                 window.location.href = '/login';
             }
+<<<<<<< HEAD
         },
         forgotPassword: async (email) => {
             const res = await fetch(`${API_URL}/auth/forgot-password`, {
@@ -199,6 +218,8 @@ export const base44 = {
             });
             if (!res.ok) throw new Error('Falha ao redefinir senha');
             return await res.json();
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         }
     },
     integrations: {
@@ -220,6 +241,7 @@ export const base44 = {
         }
     },
     users: {
+<<<<<<< HEAD
         inviteUser: async (email, role, extra = {}) => {
             try {
                 const token = localStorage.getItem('auth_token');
@@ -238,6 +260,11 @@ export const base44 = {
             const token = `inv_${Math.random().toString(36).slice(2, 10)}`;
             console.info('[invite mock]', email, role, 'token=', token);
             return { success: true, email, role, invite_token: token, mock: true };
+=======
+        inviteUser: async (email, role) => {
+            console.log("Mocking invite user", email, role);
+            return { success: true };
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         },
         promoteUser: async (userId, tenantId) => {
             const res = await fetch(`${API_URL}/users/${userId}/promote`, {

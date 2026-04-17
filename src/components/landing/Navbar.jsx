@@ -7,7 +7,11 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { getCartCount } from '@/lib/cartStore';
 
+<<<<<<< HEAD
 export default function Navbar() {
+=======
+export default function Navbar({ tenantName = "Hard Rock Gym" }) {
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
     const [cartCount, setCartCount] = useState(getCartCount());
@@ -43,6 +47,7 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     <Link to="/" className="flex items-center gap-2">
+<<<<<<< HEAD
                         <div className="w-10 h-10 rounded-xl brand-gradient flex items-center justify-center shadow-lg shadow-primary/30">
                             <Dumbbell className="w-5 h-5 text-white" />
                         </div>
@@ -50,6 +55,15 @@ export default function Navbar() {
                             <span className={scrolled ? "text-foreground" : "text-white"}>Hard</span>{' '}
                             <span className="text-primary">Rock</span>{' '}
                             <span className={scrolled ? "text-foreground" : "text-white"}>Gym</span>
+=======
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-700">
+                            <Dumbbell className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-space font-bold text-xl uppercase tracking-tighter">
+                            <span className="text-white">Hard</span>{' '}
+                            <span className="text-primary">Rock</span>{' '}
+                            <span className="text-white">Gym</span>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                         </span>
                     </Link>
 
@@ -106,15 +120,24 @@ export default function Navbar() {
                                     <Menu className="w-5 h-5" />
                                 </Button>
                             </SheetTrigger>
+<<<<<<< HEAD
                             <SheetContent side="right" className="w-72 bg-background text-foreground border-border">
                                 <div className="flex flex-col gap-2 mt-8">
                                     {links.map(link => (
                                         <Link key={link.to} to={link.to} onClick={() => setOpen(false)}>
                                             <Button variant={location.pathname === link.to ? "default" : "ghost"} className="w-full justify-start">
+=======
+                            <SheetContent side="right" className="w-72 bg-slate-950 text-white border-slate-800">
+                                <div className="flex flex-col gap-2 mt-8">
+                                    {links.map(link => (
+                                        <Link key={link.to} to={link.to} onClick={() => setOpen(false)}>
+                                            <Button variant={location.pathname === link.to ? "default" : "ghost"} className="w-full justify-start text-inherit">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                 {link.label}
                                             </Button>
                                         </Link>
                                     ))}
+<<<<<<< HEAD
                                     <hr className="my-2 border-border" />
                                     {authUser && (
                                         <Link to="/cliente" onClick={() => setOpen(false)}>
@@ -123,6 +146,14 @@ export default function Navbar() {
                                             </Button>
                                         </Link>
                                     )}
+=======
+                                    <hr className="my-2 border-slate-800" />
+                                    <Link to="/cliente" onClick={() => setOpen(false)}>
+                                        <Button variant="outline" className="w-full justify-start gap-2 border-slate-700">
+                                            <User className="w-4 h-4" /> Área Pessoal
+                                        </Button>
+                                    </Link>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     {(authUser?.role === 'admin' || authUser?.role === 'staff') && (
                                         <Link to="/admin" onClick={() => setOpen(false)}>
                                             <Button className="w-full">Painel Gestão</Button>

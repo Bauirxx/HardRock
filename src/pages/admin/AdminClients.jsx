@@ -8,7 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+<<<<<<< HEAD
 import { Search, Plus, Edit, Send, Copy } from 'lucide-react';
+=======
+import { Search, Plus, User, Phone, Mail, Edit, Trash2 } from 'lucide-react';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentTenantId } from '@/lib/tenantStore';
 import moment from 'moment';
@@ -19,6 +23,7 @@ import { UserCheck, Star, ShieldAlert } from 'lucide-react';
 export default function AdminClients() {
     const [clients, setClients] = useState([]);
     const [externalUsers, setExternalUsers] = useState([]);
+<<<<<<< HEAD
     const [, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -59,6 +64,15 @@ export default function AdminClients() {
         toast({ title: 'Link copiado', description: url });
     };
 
+=======
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [editingClient, setEditingClient] = useState(null);
+    const [form, setForm] = useState({ nome: '', email: '', telefone: '', bi_numero: '', endereco: '', status: 'active', notas: '' });
+    const { toast } = useToast();
+
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     useEffect(() => { 
         loadClients();
         loadExternalUsers();
@@ -86,7 +100,11 @@ export default function AdminClients() {
         }
         setDialogOpen(false);
         setEditingClient(null);
+<<<<<<< HEAD
         setForm({ nome: '', email: '', telefone: '', genero: '', idade: '', endereco: '', status: 'active', notas: '' });
+=======
+        setForm({ nome: '', email: '', telefone: '', bi_numero: '', endereco: '', status: 'active', notas: '' });
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         loadClients();
     };
 
@@ -94,7 +112,11 @@ export default function AdminClients() {
         setEditingClient(client);
         setForm({
             nome: client.nome || '', email: client.email || '', telefone: client.telefone || '',
+<<<<<<< HEAD
             genero: client.genero || '', idade: client.idade || '', endereco: client.endereco || '',
+=======
+            bi_numero: client.bi_numero || '', endereco: client.endereco || '',
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             status: client.status || 'active', notas: client.notas || ''
         });
         setDialogOpen(true);
@@ -139,6 +161,7 @@ export default function AdminClients() {
                     <h1 className="text-3xl font-space font-bold text-white tracking-tighter uppercase italic">
                         Gestão de <span className="text-primary">Membros</span>
                     </h1>
+<<<<<<< HEAD
                     <p className="text-muted-foreground text-sm">Controle de acesso e ativação de contas Hard Rock Gym.</p>
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -233,6 +256,29 @@ export default function AdminClients() {
                                     <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
                                         <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                                         <SelectContent className="bg-card border-border text-white">
+=======
+                    <p className="text-slate-400 text-sm">Controle de acesso e ativação de contas Hard Rock Gym.</p>
+                </div>
+                <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingClient(null); setForm({ nome: '', email: '', telefone: '', bi_numero: '', endereco: '', status: 'active', notas: '' }); } }}>
+                    <DialogTrigger asChild>
+                        <Button className="gap-2 bg-primary hover:bg-red-700 font-bold"><Plus className="w-4 h-4" /> Adicionar Manualmente</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-white">
+                        <DialogHeader><DialogTitle className="text-white text-xl font-space">Ficha de Membro</DialogTitle></DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2"><Label className="text-slate-400">Nome *</Label><Input className="bg-slate-800 border-slate-700" value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} /></div>
+                                <div className="space-y-2"><Label className="text-slate-400">Telefone *</Label><Input className="bg-slate-800 border-slate-700" value={form.telefone} onChange={e => setForm({ ...form, telefone: e.target.value })} /></div>
+                            </div>
+                            <div className="space-y-2"><Label className="text-slate-400">Email (Acesso App) *</Label><Input className="bg-slate-800 border-slate-700" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2"><Label className="text-slate-400">BI / Documento</Label><Input className="bg-slate-800 border-slate-700" value={form.bi_numero} onChange={e => setForm({ ...form, bi_numero: e.target.value })} /></div>
+                                <div className="space-y-2">
+                                    <Label className="text-slate-400">Estado</Label>
+                                    <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
+                                        <SelectTrigger className="bg-slate-800 border-slate-700"><SelectValue /></SelectTrigger>
+                                        <SelectContent className="bg-slate-900 border-slate-800 text-white">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             <SelectItem value="active">Activo</SelectItem>
                                             <SelectItem value="inactive">Inactivo</SelectItem>
                                             <SelectItem value="pending">Pendente</SelectItem>
@@ -244,6 +290,7 @@ export default function AdminClients() {
                         </div>
                     </DialogContent>
                 </Dialog>
+<<<<<<< HEAD
                 </div>
             </div>
 
@@ -254,11 +301,23 @@ export default function AdminClients() {
 
             <Tabs defaultValue="internal" className="w-full">
                 <TabsList className="bg-card border-border">
+=======
+            </div>
+
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Input placeholder="Pesquisar por nome ou email..." className="pl-10 bg-slate-900 border-slate-800 text-white" value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+
+            <Tabs defaultValue="internal" className="w-full">
+                <TabsList className="bg-slate-900 border-slate-800">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                     <TabsTrigger value="internal" className="gap-2 data-[state=active]:bg-primary">Membros Internos ({clients.length})</TabsTrigger>
                     <TabsTrigger value="external" className="gap-2 data-[state=active]:bg-primary">Registos App (Externos) ({externalUsers.length})</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="internal" className="mt-6">
+<<<<<<< HEAD
                     <Card className="bg-card border-border overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
@@ -268,11 +327,26 @@ export default function AdminClients() {
                                         <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Contacto</th>
                                         <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground hidden md:table-cell">Estado</th>
                                         <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Ações</th>
+=======
+                    <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-slate-800 bg-slate-800/50">
+                                        <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Nome do Membro</th>
+                                        <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-slate-400 hidden sm:table-cell">Contacto</th>
+                                        <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-slate-400 hidden md:table-cell">Estado</th>
+                                        <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Ações</th>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredClients.map(client => (
+<<<<<<< HEAD
                                         <tr key={client.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+=======
+                                        <tr key={client.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
@@ -280,11 +354,19 @@ export default function AdminClients() {
                                                     </div>
                                                     <div>
                                                         <p className="font-bold text-slate-200">{client.nome}</p>
+<<<<<<< HEAD
                                                         <p className="text-xs text-muted-foreground/70 font-mono">{client.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="p-4 text-sm text-muted-foreground hidden sm:table-cell">{client.telefone}</td>
+=======
+                                                        <p className="text-xs text-slate-500 font-mono">{client.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-sm text-slate-400 hidden sm:table-cell">{client.telefone}</td>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             <td className="p-4 hidden md:table-cell">
                                                 <Badge variant="outline" className={
                                                     client.status === 'active' ? 'border-green-500/50 text-green-500 bg-green-500/10' :
@@ -294,7 +376,11 @@ export default function AdminClients() {
                                             </td>
                                             <td className="p-4 text-right">
                                                 <div className="flex justify-end gap-1">
+<<<<<<< HEAD
                                                     <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-white hover:bg-muted" onClick={() => handleEdit(client)}>
+=======
+                                                    <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-white hover:bg-slate-800" onClick={() => handleEdit(client)}>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                         <Edit className="w-4 h-4" />
                                                     </Button>
                                                 </div>
@@ -304,7 +390,11 @@ export default function AdminClients() {
                                 </tbody>
                             </table>
                             {filteredClients.length === 0 && (
+<<<<<<< HEAD
                                 <div className="text-center py-16 text-muted-foreground/70 flex flex-col items-center gap-2">
+=======
+                                <div className="text-center py-16 text-slate-500 flex flex-col items-center gap-2">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     <Star className="w-8 h-8 opacity-20" />
                                     <p>Nenhum membro ativo encontrado.</p>
                                 </div>
@@ -314,6 +404,7 @@ export default function AdminClients() {
                 </TabsContent>
 
                 <TabsContent value="external" className="mt-6">
+<<<<<<< HEAD
                     <Card className="bg-card border-border overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
@@ -322,13 +413,29 @@ export default function AdminClients() {
                                         <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Utilizador Externo</th>
                                         <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">Email</th>
                                         <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Ações</th>
+=======
+                    <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-slate-800 bg-slate-800/50">
+                                        <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Utilizador Externo</th>
+                                        <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-slate-400 hidden sm:table-cell">Email</th>
+                                        <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-slate-400">Ações</th>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredUsers.map(user => (
+<<<<<<< HEAD
                                         <tr key={user.id} className="border-b border-border hover:bg-muted/30 transition-colors text-white">
                                             <td className="p-4 font-bold">{user.full_name || 'Anónimo'}</td>
                                             <td className="p-4 text-muted-foreground hidden sm:table-cell font-mono">{user.email}</td>
+=======
+                                        <tr key={user.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors text-white">
+                                            <td className="p-4 font-bold">{user.full_name || 'Anónimo'}</td>
+                                            <td className="p-4 text-slate-400 hidden sm:table-cell font-mono">{user.email}</td>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             <td className="p-4 text-right">
                                                 <Button 
                                                     size="sm" 
@@ -343,7 +450,11 @@ export default function AdminClients() {
                                 </tbody>
                             </table>
                             {filteredUsers.length === 0 && (
+<<<<<<< HEAD
                                 <div className="text-center py-16 text-muted-foreground/70 flex flex-col items-center gap-2">
+=======
+                                <div className="text-center py-16 text-slate-500 flex flex-col items-center gap-2">
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     <ShieldAlert className="w-8 h-8 opacity-20" />
                                     <p>Nenhum registo pendente de aprovação.</p>
                                 </div>

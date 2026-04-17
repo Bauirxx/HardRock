@@ -32,12 +32,21 @@ function AdminDashboardContent() {
     };
 
     const statCards = [
+<<<<<<< HEAD
         { label: 'Receita Total', value: `${stats.revenue.toLocaleString()} MZN`, icon: DollarSign, tone: 'text-success', ring: 'ring-success/20', bg: 'bg-success/10' },
         { label: 'Clientes', value: stats.clients, icon: Users, tone: 'text-info', ring: 'ring-info/20', bg: 'bg-info/10' },
         { label: 'Encomendas', value: stats.orders, icon: ShoppingCart, tone: 'text-primary', ring: 'ring-primary/20', bg: 'bg-primary/10' },
         { label: 'Leads', value: stats.leads, icon: UserPlus, tone: 'text-accent', ring: 'ring-accent/20', bg: 'bg-accent/10' },
         { label: 'Produtos', value: stats.products, icon: Package, tone: 'text-primary', ring: 'ring-primary/20', bg: 'bg-primary/10' },
         { label: 'Pendentes', value: stats.pendingOrders, icon: CreditCard, tone: 'text-warning', ring: 'ring-warning/20', bg: 'bg-warning/10' },
+=======
+        { label: 'Receita Total', value: `${stats.revenue.toLocaleString()} MZN`, icon: DollarSign, color: 'text-green-500', bg: 'bg-green-50' },
+        { label: 'Clientes', value: stats.clients, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
+        { label: 'Encomendas', value: stats.orders, icon: ShoppingCart, color: 'text-purple-500', bg: 'bg-purple-50' },
+        { label: 'Leads', value: stats.leads, icon: UserPlus, color: 'text-orange-500', bg: 'bg-orange-50' },
+        { label: 'Produtos', value: stats.products, icon: Package, color: 'text-pink-500', bg: 'bg-pink-50' },
+        { label: 'Pendentes', value: stats.pendingOrders, icon: CreditCard, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     ];
 
     return (
@@ -49,9 +58,15 @@ function AdminDashboardContent() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 {statCards.map((stat, i) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+<<<<<<< HEAD
                         <Card className="hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                             <CardContent className="p-4 sm:p-5">
                                 <div className={`w-10 h-10 rounded-xl ${stat.bg} ring-1 ${stat.ring} flex items-center justify-center ${stat.tone} mb-3`}>
+=======
+                        <Card>
+                            <CardContent className="p-4 sm:p-5">
+                                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center ${stat.color} mb-3`}>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     <stat.icon className="w-5 h-5" />
                                 </div>
                                 <p className="text-2xl font-space font-bold">{loading ? '...' : stat.value}</p>
@@ -98,7 +113,11 @@ function AdminDashboardContent() {
                                             <p className="font-medium text-sm">{lead.nome}</p>
                                             <p className="text-xs text-muted-foreground">{lead.telefone} • {moment(lead.created_date).fromNow()}</p>
                                         </div>
+<<<<<<< HEAD
                                         <Badge className={lead.status === 'new' ? 'bg-success/15 text-success border-success/20' : lead.status === 'contacted' ? 'bg-info/15 text-info border-info/20' : 'bg-accent/15 text-accent border-accent/20'}>{lead.status}</Badge>
+=======
+                                        <Badge className={lead.status === 'new' ? 'bg-green-100 text-green-800' : lead.status === 'contacted' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}>{lead.status}</Badge>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                     </div>
                                 ))}
                             </div>

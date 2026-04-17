@@ -1,8 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+<<<<<<< HEAD
 from django.utils import timezone
 import uuid
 import secrets
+=======
+import uuid
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -26,6 +30,7 @@ class CustomUser(AbstractUser):
         ('staff', 'Funcionário'),
         ('internal_client', 'Cliente Interno (Membro)'),
         ('external_client', 'Cliente Externo (Loja)'),
+<<<<<<< HEAD
         ('personal_trainer', 'Instrutor Pessoal'),
     )
     GENDER_CHOICES = (
@@ -37,10 +42,17 @@ class CustomUser(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None
+=======
+    )
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    username = None # Remove username field
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='external_client')
     foto_url = models.URLField(max_length=500, blank=True, null=True)
+<<<<<<< HEAD
     genero = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     idade = models.IntegerField(blank=True, null=True)
 
@@ -54,6 +66,12 @@ class CustomUser(AbstractUser):
     created_date = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
+=======
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    objects = CustomUserManager()
+
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
 
@@ -64,6 +82,7 @@ class Tenant(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nome = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
+<<<<<<< HEAD
     subdominio = models.CharField(max_length=100, default='default')
     descricao = models.TextField(blank=True, null=True)
     logo_url = models.URLField(max_length=500, blank=True, null=True)
@@ -89,12 +108,17 @@ class Tenant(models.Model):
     email_password = models.CharField(max_length=500, blank=True, null=True)
     email_use_tls = models.BooleanField(default=True)
 
+=======
+    descricao = models.TextField(blank=True, null=True)
+    logo_url = models.URLField(max_length=500, blank=True, null=True)
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nome
 
 class Product(models.Model):
+<<<<<<< HEAD
     TIPO_CHOICES = (
         ('supplement', 'Suplemento'),
         ('clothing', 'Roupa'),
@@ -125,11 +149,21 @@ class Product(models.Model):
     imagens = models.JSONField(default=list, blank=True)  # Array of URLs
     ficha_tecnica = models.JSONField(default=dict, blank=True)  # Dict of technical specs
     youtube_url = models.URLField(max_length=500, blank=True, null=True)
+=======
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nome = models.CharField(max_length=255)
+    descricao = models.TextField(blank=True, null=True)
+    preco = models.DecimalField(max_digits=12, decimal_places=2)
+    categoria = models.CharField(max_length=100, blank=True, null=True)
+    imagem_url = models.URLField(max_length=500, blank=True, null=True)
+    estoque = models.IntegerField(default=0)
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nome
 
+<<<<<<< HEAD
 class Order(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pendente'),
@@ -193,10 +227,18 @@ class Client(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     notas = models.TextField(blank=True, null=True)
     plano_atual = models.CharField(max_length=100, blank=True, null=True)
+=======
+class Client(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='client_profile')
+    plano_atual = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=20, default='active')
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     data_inicio = models.DateField(auto_now_add=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+<<<<<<< HEAD
         return self.nome
 
 class Lead(models.Model):
@@ -296,3 +338,24 @@ class PasswordResetToken(models.Model):
 
     def __str__(self):
         return f"Reset {self.user.email}"
+=======
+        return f"Cliente: {self.user.full_name}"
+
+class Testimonial(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nome = models.CharField(max_length=255)
+    comentario = models.TextField()
+    estrelas = models.IntegerField(default=5)
+    status = models.CharField(max_length=20, default='approved')
+    created_date = models.DateTimeField(auto_now_add=True)
+
+class Payment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    valor = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=20, default='pending')
+    tipo = models.CharField(max_length=50, default='mensalidade')
+    metodo = models.CharField(max_length=50, blank=True, null=True)
+    descricao = models.CharField(max_length=255, blank=True, null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3

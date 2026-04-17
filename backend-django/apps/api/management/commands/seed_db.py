@@ -1,7 +1,11 @@
 from django.core.management.base import BaseCommand
+<<<<<<< HEAD
 from apps.api.models import (
     CustomUser, Tenant, Product, Client, Order, Lead, Service, Testimonial, Payment
 )
+=======
+from apps.api.models import CustomUser, Tenant, Product
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 import uuid
 
 class Command(BaseCommand):
@@ -11,6 +15,7 @@ class Command(BaseCommand):
         self.stdout.write('Seeding data...')
 
         # 1. Create Tenant
+<<<<<<< HEAD
         tenant, created = Tenant.objects.get_or_create(
             slug='hardrock',
             defaults={
@@ -75,6 +80,15 @@ class Command(BaseCommand):
             ]
             tenant.save()
         self.stdout.write(f'Tenant created/updated: {tenant.nome}')
+=======
+        tenant, _ = Tenant.objects.get_or_create(
+            slug='hardrock',
+            defaults={
+                'nome': 'Hard Rock Gym',
+                'descricao': 'Elite Training Center'
+            }
+        )
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
         # 2. Create Users
         users_to_create = [
@@ -82,30 +96,43 @@ class Command(BaseCommand):
                 'email': 'admin@hardrock.com',
                 'full_name': 'Administrador Hard Rock',
                 'role': 'admin',
+<<<<<<< HEAD
                 'password': 'admin123',
                 'genero': 'M',
                 'idade': 35,
+=======
+                'password': 'admin123'
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             },
             {
                 'email': 'staff@hardrock.com',
                 'full_name': 'Instrutor Carlos',
                 'role': 'staff',
+<<<<<<< HEAD
                 'password': 'admin123',
                 'genero': 'M',
                 'idade': 28,
+=======
+                'password': 'admin123'
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             },
             {
                 'email': 'internal@hardrock.com',
                 'full_name': 'Membro Premium João',
                 'role': 'internal_client',
+<<<<<<< HEAD
                 'password': 'admin123',
                 'genero': 'M',
                 'idade': 32,
+=======
+                'password': 'admin123'
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             },
             {
                 'email': 'external@hardrock.com',
                 'full_name': 'Visitante da Loja Ana',
                 'role': 'external_client',
+<<<<<<< HEAD
                 'password': 'admin123',
                 'genero': 'F',
                 'idade': 25,
@@ -122,6 +149,10 @@ class Command(BaseCommand):
                 'disponibilidade': 'Seg-Sex 6h-22h, Sáb 8h-18h',
                 'telefone': '+258 84 123 4567',
             }
+=======
+                'password': 'admin123'
+            },
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         ]
 
         for user_data in users_to_create:
@@ -130,12 +161,15 @@ class Command(BaseCommand):
                 defaults={
                     'full_name': user_data['full_name'],
                     'role': user_data['role'],
+<<<<<<< HEAD
                     'genero': user_data.get('genero'),
                     'idade': user_data.get('idade'),
                     'especialidade': user_data.get('especialidade'),
                     'bio': user_data.get('bio'),
                     'disponibilidade': user_data.get('disponibilidade'),
                     'telefone': user_data.get('telefone'),
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                 }
             )
             if created:
@@ -148,6 +182,7 @@ class Command(BaseCommand):
                 user.save()
                 self.stdout.write(f'User updated: {user.email}')
 
+<<<<<<< HEAD
         # 3. Create Sample Products
         products_to_create = [
             {
@@ -286,5 +321,17 @@ class Command(BaseCommand):
             )
             if created:
                 self.stdout.write(f'Service created: {service.nome}')
+=======
+        # 3. Create a Sample Product
+        Product.objects.get_or_create(
+            nome='Whey Protein Hard Rock',
+            defaults={
+                'descricao': 'Proteína de alta qualidade',
+                'preco': 2500,
+                'categoria': 'Suplementos',
+                'estoque': 50
+            }
+        )
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
         self.stdout.write(self.style.SUCCESS('Seeding completed!'))

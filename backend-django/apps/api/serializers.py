@@ -1,4 +1,5 @@
 from rest_framework import serializers
+<<<<<<< HEAD
 from .models import (
     CustomUser, Tenant, Product, Client, Testimonial, Payment,
     Order, Lead, Service, PasswordResetToken
@@ -53,19 +54,42 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = '__all__'
 
+=======
+from .models import CustomUser, Tenant, Product, Client, Testimonial
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 class TestimonialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testimonial
         fields = '__all__'
 
+<<<<<<< HEAD
 
 class PasswordResetTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = PasswordResetToken
         fields = ('id', 'token', 'expires_at', 'used', 'created_at')
 
+=======
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'email', 'full_name', 'role', 'foto_url', 'created_date')
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+<<<<<<< HEAD
+=======
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+class TenantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tenant
+        fields = '__all__'
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3

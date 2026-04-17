@@ -8,9 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+<<<<<<< HEAD
 import { Dumbbell, MessageCircle, Info, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube';
+=======
+import { Dumbbell, MessageCircle, Info, Package } from 'lucide-react';
+import { motion } from 'framer-motion';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 export default function EquipmentPage() {
     const [equipment, setEquipment] = useState([]);
@@ -58,8 +63,11 @@ export default function EquipmentPage() {
                                         <div className="aspect-square relative overflow-hidden bg-muted">
                                             {item.imagens?.[0] ? (
                                                 <img src={item.imagens[0]} alt={item.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+<<<<<<< HEAD
                                             ) : getYouTubeThumbnail(item.youtube_url) ? (
                                                 <img src={getYouTubeThumbnail(item.youtube_url)} alt={item.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
                                                     <Dumbbell className="w-16 h-16 text-muted-foreground/20" />
@@ -68,11 +76,14 @@ export default function EquipmentPage() {
                                             {item.sob_consulta && (
                                                 <Badge variant="secondary" className="absolute top-3 right-3">Sob Consulta</Badge>
                                             )}
+<<<<<<< HEAD
                                             {getYouTubeEmbedUrl(item.youtube_url) && (
                                                 <Badge className="absolute top-3 left-3 gap-1 bg-red-600 hover:bg-red-700">
                                                     <PlayCircle className="w-3 h-3" /> Vídeo
                                                 </Badge>
                                             )}
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                         </div>
                                         <CardContent className="p-5">
                                             <h3 className="font-space font-semibold text-lg mb-1">{item.nome}</h3>
@@ -91,11 +102,16 @@ export default function EquipmentPage() {
                                                             <Info className="w-4 h-4" /> Ficha Técnica
                                                         </Button>
                                                     </DialogTrigger>
+<<<<<<< HEAD
                                                     <DialogContent className="max-w-2xl">
+=======
+                                                    <DialogContent>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                         <DialogHeader>
                                                             <DialogTitle>{item.nome}</DialogTitle>
                                                         </DialogHeader>
                                                         <div className="space-y-3">
+<<<<<<< HEAD
                                                             {getYouTubeEmbedUrl(item.youtube_url) && (
                                                                 <div className="aspect-video rounded-lg overflow-hidden bg-black">
                                                                     <iframe
@@ -107,6 +123,8 @@ export default function EquipmentPage() {
                                                                     />
                                                                 </div>
                                                             )}
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                             {item.descricao && <p className="text-muted-foreground">{item.descricao}</p>}
                                                             {item.ficha_tecnica && Object.keys(item.ficha_tecnica).length > 0 && (
                                                                 <div className="space-y-2">

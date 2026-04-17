@@ -1,7 +1,11 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
+<<<<<<< HEAD
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+=======
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -16,9 +20,12 @@ import TrackingPage from './pages/TrackingPage';
 import EquipmentPage from './pages/EquipmentPage';
 import ClientDashboard from './pages/ClientDashboard';
 import LoginPage from './pages/LoginPage';
+<<<<<<< HEAD
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 // Admin imports
 import AdminLayout from './components/admin/AdminLayout';
@@ -59,26 +66,37 @@ const AuthenticatedApp = () => {
     }
   }
 
+<<<<<<< HEAD
   // Role gates
   const isStaff = user?.role === 'staff' || user?.role === 'admin';
 
   // Admins/staff landing on /cliente are redirected to /admin (cleaner UX)
   const ClientEntry = isStaff ? <Navigate to="/admin" replace /> : <ClientDashboard />;
+=======
+  // Render the main app
+  const isAdmin = user?.role === 'admin';
+  const isStaff = user?.role === 'staff' || user?.role === 'admin';
+  const isInternal = user?.role === 'internal_client' || user?.role === 'admin';
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
   return (
     <Routes>
       {/* Public pages */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+<<<<<<< HEAD
       <Route path="/registo" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
       <Route path="/loja" element={<StorePage />} />
       <Route path="/produto/:id" element={<ProductDetailPage />} />
       <Route path="/carrinho" element={<CartPage />} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/rastreio" element={<TrackingPage />} />
       <Route path="/equipamentos" element={<EquipmentPage />} />
+<<<<<<< HEAD
 
       {/* Account/Member pages */}
       <Route path="/cliente" element={ClientEntry} />
@@ -88,6 +106,17 @@ const AuthenticatedApp = () => {
 
       {/* Admin pages */}
       <Route path="/admin" element={isStaff ? <AdminLayout /> : <Navigate to="/" replace />}>
+=======
+      
+      {/* Account/Member pages */}
+      <Route path="/cliente" element={<ClientDashboard />} />
+      
+      {/* Trainer/Staff specifics */}
+      <Route path="/trainer" element={isStaff ? <TrainerDashboard /> : <LandingPage />} />
+
+      {/* Admin pages */}
+      <Route path="/admin" element={isStaff ? <AdminLayout /> : <LandingPage />}>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         <Route index element={<AdminDashboard />} />
         <Route path="clientes" element={<AdminClients />} />
         <Route path="produtos" element={<AdminProducts />} />

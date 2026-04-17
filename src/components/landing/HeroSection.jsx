@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { ShoppingBag, UserCheck, Dumbbell, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -65,6 +66,24 @@ export default function HeroSection({ heroImage, slides = [] }) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </motion.div>
             </AnimatePresence>
+=======
+import { ShoppingBag, UserCheck, Dumbbell, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function HeroSection({ heroImage }) {
+    return (
+        <section className="relative min-h-screen flex items-center overflow-hidden">
+            {/* Background */}
+            <div className="absolute inset-0">
+                <img
+                    src={heroImage}
+                    alt="Gym interior"
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            </div>
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
                 <motion.div
@@ -131,6 +150,7 @@ export default function HeroSection({ heroImage, slides = [] }) {
                     ))}
                 </motion.div>
             </div>
+<<<<<<< HEAD
 
             {/* Slide Navigation */}
             {displaySlides.length > 1 && (
@@ -168,6 +188,8 @@ export default function HeroSection({ heroImage, slides = [] }) {
                     </div>
                 </>
             )}
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         </section>
     );
 }

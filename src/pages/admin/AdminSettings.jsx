@@ -17,7 +17,10 @@ const emptyTenant = {
     google_maps_embed: '', primary_color: '#10B981',
     redes_sociais: { instagram: '', facebook: '', youtube: '', twitter: '', tiktok: '' },
     videos_youtube: [],
+<<<<<<< HEAD
     hero_images: [],
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 };
 
 function AdminSettingsContent() {
@@ -27,7 +30,10 @@ function AdminSettingsContent() {
     const [saving, setSaving] = useState(false);
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [newVideo, setNewVideo] = useState({ titulo: '', url: '' });
+<<<<<<< HEAD
     const [newSlide, setNewSlide] = useState({ url: '', titulo: '', link: '', tipo: 'geral' });
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
     const { toast } = useToast();
 
     useEffect(() => { loadTenant(); }, []);
@@ -41,7 +47,10 @@ function AdminSettingsContent() {
                 ...emptyTenant, ...t,
                 redes_sociais: { ...emptyTenant.redes_sociais, ...(t.redes_sociais || {}) },
                 videos_youtube: t.videos_youtube || [],
+<<<<<<< HEAD
                 hero_images: t.hero_images || [],
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             });
         }
         setLoading(false);
@@ -104,7 +113,10 @@ function AdminSettingsContent() {
                 <TabsList className="mb-6">
                     <TabsTrigger value="geral">Geral</TabsTrigger>
                     <TabsTrigger value="contactos">Contactos</TabsTrigger>
+<<<<<<< HEAD
                     <TabsTrigger value="hero">Hero Slider</TabsTrigger>
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                     <TabsTrigger value="redes">Redes Sociais</TabsTrigger>
                     <TabsTrigger value="videos">Vídeos YouTube</TabsTrigger>
                 </TabsList>
@@ -188,6 +200,7 @@ function AdminSettingsContent() {
                     </Card>
                 </TabsContent>
 
+<<<<<<< HEAD
                 <TabsContent value="hero">
                     <Card>
                         <CardHeader><CardTitle className="text-base">Slides do Hero (Slider Principal)</CardTitle></CardHeader>
@@ -265,6 +278,8 @@ function AdminSettingsContent() {
                     </Card>
                 </TabsContent>
 
+=======
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                 <TabsContent value="redes">
                     <Card>
                         <CardHeader><CardTitle className="text-base">Redes Sociais</CardTitle></CardHeader>

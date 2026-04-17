@@ -125,6 +125,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+<<<<<<< HEAD
 # CORS - Allow both development and production origins
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',      # Vite development
@@ -161,3 +162,8 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@hardrockgym.mz')
+=======
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True # In production change this!
+CORS_ALLOW_CREDENTIALS = True
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3

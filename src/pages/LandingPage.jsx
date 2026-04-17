@@ -15,6 +15,7 @@ const HERO_IMAGE = "https://media.base44.com/images/public/69cae95a5b583fd843ebf
 export default function LandingPage() {
     const [products, setProducts] = useState([]);
     const [testimonials, setTestimonials] = useState([]);
+<<<<<<< HEAD
     const [heroSlides, setHeroSlides] = useState([]);
 
     useEffect(() => {
@@ -28,6 +29,10 @@ export default function LandingPage() {
             }
         }).catch(() => { });
 
+=======
+
+    useEffect(() => {
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         base44.entities.Product.filter({ status: 'active', destaque: true }).then(setProducts).catch(() => { });
         base44.entities.Product.filter({ status: 'active' }).then(p => {
             if (products.length === 0) setProducts(p);
@@ -38,7 +43,11 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen">
             <Navbar />
+<<<<<<< HEAD
             <HeroSection heroImage={HERO_IMAGE} slides={heroSlides} />
+=======
+            <HeroSection heroImage={HERO_IMAGE} />
+>>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
             <ServicesSection />
             <FeaturedProducts products={products} />
             <TestimonialsSection testimonials={testimonials} />
