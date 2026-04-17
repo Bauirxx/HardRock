@@ -1,0 +1,67 @@
+import { useLocation } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
+
+
+export default function PageNotFound() {
+    const location = useLocation();
+    const pageName = location.pathname.substring(1);
+
+    const { data: authData, isFetched } = useQuery({
+        queryKey: ['user'],
+        queryFn: async () => {
+            try {
+                const user = await base44.auth.me();
+                return { user, isAuthenticated: true };
+            } catch (error) {
+                return { user: null, isAuthenticated: false };
+            }
+        }
+    });
+
+    return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
+            <div className="max-w-md w-full">
+                <div className="text-center space-y-6">
+                    <div className="space-y-2">
+                        <h1 className="text-7xl font-space font-bold text-primary">404</h1>
+                        <div className="h-0.5 w-16 bg-border mx-auto"></div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <h2 className="text-2xl font-space font-semibold">
+                            Página Não Encontrada
+                        </h2>
+                        <p className="text-muted-foreground leading-relaxed">
+                            A página <span className="font-medium text-foreground">"{pageName}"</span> não existe.
+                        </p>
+                    </div>
+
+                    {isFetched && authData?.isAuthenticated && authData.user?.role === 'admin' && (
+                        <div className="mt-8 p-4 bg-card border border-border rounded-lg text-left">
+                            <div className="flex items-start gap-3">
+                                <div className="w-5 h-5 rounded-full bg-warning/20 flex items-center justify-center mt-0.5 shrink-0">
+                                    <div className="w-2 h-2 rounded-full bg-warning"></div>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium">Nota de Admin</p>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Esta rota pode ainda não estar implementada.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="pt-6">
+                        <Button onClick={() => (window.location.href = '/')} className="gap-2">
+                            <Home className="w-4 h-4" /> Voltar ao Início
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -1,0 +1,96 @@
+========================================
+HARD ROCK GYM - COMO USAR
+========================================
+
+PASSO 1: Abra o primeiro terminal (CMD ou PowerShell)
+========================================
+cd d:\HardRock--main\backend-django
+python manage.py runserver 0.0.0.0:8000
+
+Deve aparecer:
+"Watching for file changes with StatReloader"
+
+NÃO FECHE ESTE TERMINAL!
+
+
+PASSO 2: Abra um SEGUNDO terminal (outro CMD ou PowerShell)
+========================================
+cd d:\HardRock--main
+npm run dev
+
+Deve aparecer:
+"VITE v6.4.2 ready in XXX ms"
+"Local: http://localhost:5175/"
+
+NÃO FECHE ESTE TERMINAL!
+
+
+PASSO 3: Abra o Navegador
+========================================
+Acesse: http://localhost:5175
+
+Vão aparecer:
+✓ Landing page com slider automático
+✓ Produtos
+✓ Depoimentos
+
+
+PASSO 4: Faça Login
+========================================
+Clique em "Iniciar Sessão"
+
+Email: admin@hardrock.com
+Senha: admin123
+
+Clique em "ACEDER AO GINÁSIO"
+
+
+PASSO 5: Admin Dashboard
+========================================
+Após login como admin, você terá acesso a:
+✓ Gestão de Membros
+✓ Gestão de Produtos
+✓ Configurações (incluindo Hero Slider)
+✓ Depoimentos
+✓ Serviços
+
+
+TROUBLESHOOTING:
+========================================
+
+Problema: "Página em branco"
+Solução: Aguarde 5-10 segundos, o Vite pode estar compilando
+
+Problema: "Login não funciona"
+Solução:
+- Verifique se Django está rodando (Terminal 1)
+- Verifique se Vite está rodando (Terminal 2)
+- Recarregue a página (Ctrl+F5)
+
+Problema: "404 Not Found"
+Solução: Certifique-se de usar http://localhost:5175 (não 5173)
+
+Problema: "Erro de conexão"
+Solução:
+- Certifique-se de que tem 2 terminais abertos
+- Terminal 1: Django na porta 8000
+- Terminal 2: Vite (qualquer porta)
+
+
+CREDENCIAIS DE TESTE:
+========================================
+admin@hardrock.com / admin123 (Admin)
+staff@hardrock.com / admin123 (Staff)
+internal@hardrock.com / admin123 (Membro)
+external@hardrock.com / admin123 (Cliente)
+
+
+IMPORTANTE:
+========================================
+- NUNCA feche os dois terminais
+- Se fechar um, a aplicação para de funcionar
+- Sempre abra os 2 antes de usar
+
+
+PRONTO! O SISTEMA ESTÁ FUNCIONANDO!
+========================================

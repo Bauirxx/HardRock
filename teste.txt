@@ -1,0 +1,10 @@
+cd d:\HardRock--main
+rm -rf .git
+git init
+git config user.email "arseniobaquir@gmail.com"
+git config user.name "Arsénio Baquir"
+git add .
+git commit -m "Hard Rock Gym - Sistema Completo"
+git remote add origin https://Bauirxx:a840231119b@github.com/Bauirxx/HardRock.git
+git branch -M main
+git push -u origin main

@@ -1,0 +1,1 @@
+{"name":"Testimonial","type":"object","properties":{"tenant_id":{"type":"string"},"nome":{"type":"string"},"texto":{"type":"string"},"stars":{"type":"integer","minimum":1,"maximum":5,"default":5},"foto_url":{"type":"string"},"status":{"type":"string","enum":["pending","approved","rejected"],"default":"pending"}},"required":["tenant_id","nome","texto"]}

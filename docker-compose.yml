@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fitgym-postgres
+    environment:
+      POSTGRES_USER: fitgym
+      POSTGRES_PASSWORD: fitgym_pass
+      POSTGRES_DB: fitgym_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: larius-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  backend:
+    build: ./backend-django
+    container_name: fitgym-backend
+    volumes:
+      - ./backend-django:/app
+      - ./uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DB_NAME=fitgym_db
+      - DB_USER=fitgym
+      - DB_PASSWORD=fitgym_pass
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - SECRET_KEY=django-insecure-hardrockgym-secret-2026
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  minio_data:
