@@ -20,8 +20,8 @@ export default function ProductCard({ product }) {
         <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col">
             <Link to={`/produto/${product.id}`} className="flex flex-col h-full">
                 <div className="aspect-square relative overflow-hidden bg-muted">
-                    {product.imagens?.[0] ? (
-                        <img src={product.imagens[0]} alt={product.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    {(product.imagens?.[0] || product.imagem_url || product.image) ? (
+                        <img src={product.imagens?.[0] || product.imagem_url || product.image} alt={product.nome} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
                             <ShoppingCart className="w-12 h-12 text-muted-foreground/30" />
@@ -32,7 +32,7 @@ export default function ProductCard({ product }) {
                             -{Math.round((1 - product.preco_promocional / product.preco) * 100)}%
                         </Badge>
                     )}
-                    {product.stock_quantidade <= 0 && (
+                    {(product.stock_quantidade <= 0 || product.stock <= 0) && (
                         <Badge variant="secondary" className="absolute top-3 right-3">Esgotado</Badge>
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -44,7 +44,7 @@ export default function ProductCard({ product }) {
                     </div>
                 </div>
                 <CardContent className="p-4 flex-1 flex flex-col">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.tipo}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.categoria || product.tipo}</p>
                     <h3 className="font-semibold mb-2 line-clamp-2 flex-1">{product.nome}</h3>
                     <div className="flex items-center justify-between mt-auto">
                         <div>
@@ -62,7 +62,7 @@ export default function ProductCard({ product }) {
                             variant="outline"
                             className="h-9 w-9 shrink-0"
                             onClick={handleAdd}
-                            disabled={product.stock_quantidade <= 0}
+                            disabled={product.stock_quantidade <= 0 && product.stock <= 0}
                         >
                             <ShoppingCart className="w-4 h-4" />
                         </Button>

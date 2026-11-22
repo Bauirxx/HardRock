@@ -1,0 +1,13 @@
+# Contexto de build do frontend (web.Dockerfile) — manter leve
+node_modules
+dist
+build
+backend-spring
+.git
+.github
+.vscode
+.idea
+*.log
+npm-debug.log*
+.env
+.env.*

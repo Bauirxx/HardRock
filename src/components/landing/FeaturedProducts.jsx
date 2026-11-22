@@ -50,8 +50,8 @@ export default function FeaturedProducts({ products = [] }) {
                         >
                             <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                                 <div className="aspect-square relative overflow-hidden bg-muted">
-                                    {product.imagens?.[0] ? (
-                                        <img src={product.imagens[0]} alt={product.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    {(product.imagens?.[0] || product.imagem_url || product.image) ? (
+                                        <img src={product.imagens?.[0] || product.imagem_url || product.image} alt={product.nome} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                             <ShoppingCart className="w-12 h-12" />
@@ -64,7 +64,7 @@ export default function FeaturedProducts({ products = [] }) {
                                     )}
                                 </div>
                                 <CardContent className="p-4">
-                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.tipo}</p>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.categoria || product.tipo}</p>
                                     <h3 className="font-semibold mb-2 line-clamp-1">{product.nome}</h3>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">

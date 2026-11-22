@@ -1,50 +1,81 @@
+import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-<<<<<<< HEAD
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-=======
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
-// Page imports
+// Eager-loaded: landing + login (first paint)
 import LandingPage from './pages/LandingPage';
-import StorePage from './pages/StorePage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
-import TrackingPage from './pages/TrackingPage';
-import EquipmentPage from './pages/EquipmentPage';
-import ClientDashboard from './pages/ClientDashboard';
 import LoginPage from './pages/LoginPage';
-<<<<<<< HEAD
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
-// Admin imports
-import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminClients from './pages/admin/AdminClients';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminPayments from './pages/admin/AdminPayments';
-import AdminLeads from './pages/admin/AdminLeads';
-import AdminServices from './pages/admin/AdminServices';
-import AdminTestimonials from './pages/admin/AdminTestimonials';
-import AdminTrainers from './pages/admin/AdminTrainers';
-import AdminSettings from './pages/admin/AdminSettings';
-import TrainerDashboard from './pages/TrainerDashboard';
+// Lazy-loaded: everything else (code-split)
+const HardRockPage = lazy(() => import('./pages/HardRockPage'));
+const StorePage = lazy(() => import('./pages/StorePage'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const PaymentReturnPage = lazy(() => import('./pages/PaymentReturnPage'));
+const TrackingPage = lazy(() => import('./pages/TrackingPage'));
+const EquipmentPage = lazy(() => import('./pages/EquipmentPage'));
+const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const TrainerDashboard = lazy(() => import('./pages/TrainerDashboard'));
+
+// Admin — heavy bundle, split separately
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminClients = lazy(() => import('./pages/admin/AdminClients'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'));
+const AdminLeads = lazy(() => import('./pages/admin/AdminLeads'));
+const AdminServices = lazy(() => import('./pages/admin/AdminServices'));
+const AdminTestimonials = lazy(() => import('./pages/admin/AdminTestimonials'));
+const AdminTrainers = lazy(() => import('./pages/admin/AdminTrainers'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminSubscriptions = lazy(() => import('./pages/admin/AdminSubscriptions'));
+
+function RouteSpinner() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground animate-pulse">A carregar...</p>
+      </div>
+    </div>
+  );
+}
+
+// Guarda de rota: bloqueia páginas privadas sem sessão válida.
+// Loja e landing são públicas e não usam este guarda.
+function RequireAuth({ children, allowedRoles }) {
+  const { user, isAuthenticated, isLoadingAuth } = useAuth();
+  const hasToken = !!localStorage.getItem('auth_token');
+
+  if (isLoadingAuth) return <RouteSpinner />;
+
+  // Sem token ou sessão inválida/expirada → obrigar login (mesmo se em cache)
+  if (!isAuthenticated || !hasToken) {
+    const returnUrl = encodeURIComponent(window.location.pathname);
+    return <Navigate to={`/login?return_url=${returnUrl}`} replace />;
+  }
+
+  // Autenticado mas sem o papel exigido → mandar para a página inicial
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
 
 const AuthenticatedApp = () => {
   const { user, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -53,12 +84,10 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically if not already there
       if (window.location.pathname !== '/login') {
         navigateToLogin();
         return null;
@@ -66,77 +95,69 @@ const AuthenticatedApp = () => {
     }
   }
 
-<<<<<<< HEAD
-  // Role gates
   const isStaff = user?.role === 'staff' || user?.role === 'admin';
+  const isTrainer = user?.role === 'personal_trainer';
 
-  // Admins/staff landing on /cliente are redirected to /admin (cleaner UX)
-  const ClientEntry = isStaff ? <Navigate to="/admin" replace /> : <ClientDashboard />;
-=======
-  // Render the main app
-  const isAdmin = user?.role === 'admin';
-  const isStaff = user?.role === 'staff' || user?.role === 'admin';
-  const isInternal = user?.role === 'internal_client' || user?.role === 'admin';
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
+  const ClientEntry = isStaff
+    ? <Navigate to="/admin" replace />
+    : isTrainer
+    ? <Navigate to="/trainer" replace />
+    : <ClientDashboard />;
 
   return (
-    <Routes>
-      {/* Public pages */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-<<<<<<< HEAD
-      <Route path="/registo" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
-      <Route path="/loja" element={<StorePage />} />
-      <Route path="/produto/:id" element={<ProductDetailPage />} />
-      <Route path="/carrinho" element={<CartPage />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/rastreio" element={<TrackingPage />} />
-      <Route path="/equipamentos" element={<EquipmentPage />} />
-<<<<<<< HEAD
+    <Suspense fallback={<RouteSpinner />}>
+      <Routes>
+        {/* Public pages */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/ginasio" element={<HardRockPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registo" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/loja" element={<StorePage />} />
+        <Route path="/produto/:id" element={<ProductDetailPage />} />
+        <Route path="/carrinho" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/pagamento/retorno" element={<PaymentReturnPage />} />
+        <Route path="/rastreio" element={<TrackingPage />} />
+        <Route path="/equipamentos" element={<EquipmentPage />} />
 
-      {/* Account/Member pages */}
-      <Route path="/cliente" element={ClientEntry} />
+        {/* Account/Member pages — exigem sessão */}
+        <Route path="/cliente" element={<RequireAuth>{ClientEntry}</RequireAuth>} />
 
-      {/* Trainer/Staff specifics */}
-      <Route path="/trainer" element={isStaff ? <TrainerDashboard /> : <Navigate to="/" replace />} />
+        {/* Trainer page — exige sessão de trainer/staff */}
+        <Route path="/trainer" element={
+          <RequireAuth allowedRoles={['personal_trainer', 'admin', 'staff']}>
+            <TrainerDashboard />
+          </RequireAuth>
+        } />
 
-      {/* Admin pages */}
-      <Route path="/admin" element={isStaff ? <AdminLayout /> : <Navigate to="/" replace />}>
-=======
-      
-      {/* Account/Member pages */}
-      <Route path="/cliente" element={<ClientDashboard />} />
-      
-      {/* Trainer/Staff specifics */}
-      <Route path="/trainer" element={isStaff ? <TrainerDashboard /> : <LandingPage />} />
+        {/* Admin pages — exigem sessão de admin/staff */}
+        <Route path="/admin" element={
+          <RequireAuth allowedRoles={['admin', 'staff']}>
+            <AdminLayout />
+          </RequireAuth>
+        }>
+          <Route index element={<AdminDashboard />} />
+          <Route path="clientes" element={<AdminClients />} />
+          <Route path="produtos" element={<AdminProducts />} />
+          <Route path="encomendas" element={<AdminOrders />} />
+          <Route path="pagamentos" element={<AdminPayments />} />
+          <Route path="leads" element={<AdminLeads />} />
+          <Route path="servicos" element={<AdminServices />} />
+          <Route path="depoimentos" element={<AdminTestimonials />} />
+          <Route path="trainers" element={<AdminTrainers />} />
+          <Route path="subscricoes" element={<AdminSubscriptions />} />
+          <Route path="configuracoes" element={<AdminSettings />} />
+        </Route>
 
-      {/* Admin pages */}
-      <Route path="/admin" element={isStaff ? <AdminLayout /> : <LandingPage />}>
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
-        <Route index element={<AdminDashboard />} />
-        <Route path="clientes" element={<AdminClients />} />
-        <Route path="produtos" element={<AdminProducts />} />
-        <Route path="encomendas" element={<AdminOrders />} />
-        <Route path="pagamentos" element={<AdminPayments />} />
-        <Route path="leads" element={<AdminLeads />} />
-        <Route path="servicos" element={<AdminServices />} />
-        <Route path="depoimentos" element={<AdminTestimonials />} />
-        <Route path="trainers" element={<AdminTrainers />} />
-        <Route path="configuracoes" element={<AdminSettings />} />
-      </Route>
-
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>

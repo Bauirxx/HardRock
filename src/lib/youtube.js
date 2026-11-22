@@ -3,7 +3,8 @@ export function getYouTubeEmbedUrl(videoId) {
 }
 
 export function getYouTubeThumbnail(videoId) {
-    return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    if (!videoId) return null;
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 }
 
 export function extractYouTubeId(url) {

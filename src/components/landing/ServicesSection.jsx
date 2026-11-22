@@ -1,17 +1,20 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Dumbbell, Heart, Zap, Users, Trophy, Clock } from 'lucide-react';
+import { Dumbbell, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-
-const services = [
-    { icon: Dumbbell, name: "Musculação", desc: "Equipamento de última geração para treino de força" },
-    { icon: Zap, name: "CrossFit", desc: "Treinos funcionais de alta intensidade" },
-    { icon: Heart, name: "Yoga & Pilates", desc: "Corpo e mente em equilíbrio" },
-    { icon: Users, name: "Aulas de Grupo", desc: "Motivação e energia colectiva" },
-    { icon: Trophy, name: "Personal Trainer", desc: "Acompanhamento personalizado" },
-    { icon: Clock, name: "Cardio Zone", desc: "Passadeiras, bicicletas e elípticas" },
-];
+import { base44 } from '@/api/base44Client';
 
 export default function ServicesSection() {
+    const [apiServices, setApiServices] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        base44.entities.Service.filter({ status: 'active' })
+            .then(data => { setApiServices(data || []); })
+            .catch(() => {})
+            .finally(() => setLoaded(true));
+    }, []);
+
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
@@ -21,7 +24,7 @@ export default function ServicesSection() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <span className="text-primary text-sm font-semibold tracking-widest uppercase">Serviços</span>
+                    <span className="text-primary text-sm font-semibold tracking-widest uppercase">Planos & Serviços</span>
                     <h2 className="text-3xl sm:text-4xl font-space font-bold mt-2 mb-4">
                         Tudo o que precisa num só lugar
                     </h2>
@@ -30,27 +33,60 @@ export default function ServicesSection() {
                     </p>
                 </motion.div>
 
+                {!loaded && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="rounded-xl border border-border/50 bg-muted/30 animate-pulse h-48" />
+                        ))}
+                    </div>
+                )}
+
+                {loaded && apiServices.length === 0 && null}
+
+                {loaded && apiServices.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {services.map((service, i) => (
+                    {apiServices.map((s, i) => (
                         <motion.div
-                            key={i}
+                            key={s.id}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
                         >
-                            <Card className="group hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 border-border/50">
+                            <Card className="group hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 border-border/50 overflow-hidden">
+                                <div className="h-1" style={{ backgroundColor: s.cor || '#10B981' }} />
                                 <CardContent className="p-6">
-                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                                        <service.icon className="w-6 h-6 text-primary" />
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:opacity-80 transition-colors"
+                                            style={{ backgroundColor: `${s.cor || '#10B981'}20` }}>
+                                            <Dumbbell className="w-6 h-6" style={{ color: s.cor || '#10B981' }} />
+                                        </div>
+                                        {s.inclui_pt && (
+                                            <span className="text-xs px-2 py-1 rounded-full font-medium"
+                                                style={{ backgroundColor: `${s.cor || '#10B981'}20`, color: s.cor || '#10B981' }}>
+                                                +PT
+                                            </span>
+                                        )}
                                     </div>
-                                    <h3 className="font-space font-semibold text-lg mb-2">{service.name}</h3>
-                                    <p className="text-muted-foreground text-sm">{service.desc}</p>
+                                    <h3 className="font-space font-semibold text-lg mb-1">{s.nome}</h3>
+                                    {s.descricao && <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{s.descricao}</p>}
+                                    {Array.isArray(s.beneficios) && s.beneficios.slice(0, 3).map((b, bi) => (
+                                        <div key={bi} className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                            <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                                            {b}
+                                        </div>
+                                    ))}
+                                    {s.preco_mensal > 0 && (
+                                        <p className="font-bold text-xl mt-3" style={{ color: s.cor || '#10B981' }}>
+                                            {Number(s.preco_mensal).toLocaleString('pt-MZ')} <span className="text-sm font-normal text-muted-foreground">MZN/mês</span>
+                                        </p>
+                                    )}
                                 </CardContent>
                             </Card>
                         </motion.div>
                     ))}
                 </div>
+                )}
             </div>
         </section>
     );

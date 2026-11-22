@@ -9,25 +9,16 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-<<<<<<< HEAD
 import { Search, Plus, Package, Edit, Trash2, Upload, X, Youtube } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentTenantId } from '@/lib/tenantStore';
 import { getYouTubeId } from '@/lib/youtube';
-=======
-import { Search, Plus, Package, Edit, Trash2, Upload, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { getCurrentTenantId } from '@/lib/tenantStore';
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 
 const emptyForm = {
     nome: '', descricao: '', preco: '', preco_promocional: '', tipo: 'supplement',
     is_machine: false, stock_quantidade: '', sku: '', status: 'active',
-<<<<<<< HEAD
     sob_consulta: false, destaque: false, categoria: '', imagens: [], youtube_url: '',
-=======
-    sob_consulta: false, destaque: false, categoria: '', imagens: [],
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
 };
 
 export default function AdminProducts() {
@@ -38,6 +29,7 @@ export default function AdminProducts() {
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(emptyForm);
     const [uploadingImg, setUploadingImg] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const { toast } = useToast();
 
     useEffect(() => { loadProducts(); }, []);
@@ -52,21 +44,26 @@ export default function AdminProducts() {
         const payload = {
             ...form,
             preco: parseFloat(form.preco) || 0,
-            preco_promocional: form.preco_promocional ? parseFloat(form.preco_promocional) : undefined,
+            preco_promocional: form.preco_promocional ? parseFloat(form.preco_promocional) : null,
             stock_quantidade: parseInt(form.stock_quantidade) || 0,
-            tenant_id: getCurrentTenantId() || 'default',
+            youtube_url: form.youtube_url || null,
+            tenant_id: getCurrentTenantId() || null,
         };
-        if (editing) {
-            await base44.entities.Product.update(editing.id, payload);
-            toast({ title: "Produto atualizado" });
-        } else {
-            await base44.entities.Product.create(payload);
-            toast({ title: "Produto criado" });
+        try {
+            if (editing) {
+                await base44.entities.Product.update(editing.id, payload);
+                toast({ title: "Produto atualizado" });
+            } else {
+                await base44.entities.Product.create(payload);
+                toast({ title: "Produto criado com sucesso" });
+            }
+            setDialogOpen(false);
+            setEditing(null);
+            setForm(emptyForm);
+            loadProducts();
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro ao guardar', description: err.message });
         }
-        setDialogOpen(false);
-        setEditing(null);
-        setForm(emptyForm);
-        loadProducts();
     };
 
     const handleImageUpload = async (e) => {
@@ -91,19 +88,19 @@ export default function AdminProducts() {
             stock_quantidade: product.stock_quantidade?.toString() || '', sku: product.sku || '',
             status: product.status || 'active', sob_consulta: product.sob_consulta || false,
             destaque: product.destaque || false, categoria: product.categoria || '',
-<<<<<<< HEAD
             imagens: product.imagens || [], youtube_url: product.youtube_url || '',
-=======
-            imagens: product.imagens || [],
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
         });
         setDialogOpen(true);
     };
 
     const handleDelete = async (id) => {
-        await base44.entities.Product.delete(id);
-        toast({ title: "Produto removido" });
-        loadProducts();
+        try {
+            await base44.entities.Product.delete(id);
+            toast({ title: "Produto removido" });
+            loadProducts();
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro ao remover', description: err.message });
+        }
     };
 
     const filtered = products.filter(p => p.nome?.toLowerCase().includes(search.toLowerCase()));
@@ -131,7 +128,7 @@ export default function AdminProducts() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Label>Tipo</Label>
-                                    <Select value={form.tipo} onValueChange={v => setForm({ ...form, tipo: v })}>
+                                    <Select value={form.tipo} onValueChange={v => setForm({ ...form, tipo: v, is_machine: v === 'machine' || v === 'equipment' ? true : form.is_machine })}>
                                         <SelectTrigger><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="supplement">Suplemento</SelectItem>
@@ -154,7 +151,6 @@ export default function AdminProducts() {
                                 <div className="flex items-center gap-2"><Switch checked={form.destaque} onCheckedChange={v => setForm({ ...form, destaque: v })} /><Label>Destaque</Label></div>
                             </div>
                             <div>
-<<<<<<< HEAD
                                 <Label className="flex items-center gap-2"><Youtube className="w-4 h-4 text-red-500" /> Vídeo do YouTube (opcional)</Label>
                                 <Input
                                     placeholder="https://youtube.com/watch?v=..."
@@ -169,8 +165,6 @@ export default function AdminProducts() {
                                 )}
                             </div>
                             <div>
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                 <Label>Imagens do Produto</Label>
                                 <div className="flex flex-wrap gap-2 mt-2 mb-2">
                                     {(form.imagens || []).map((img, idx) => (
@@ -221,7 +215,7 @@ export default function AdminProducts() {
                                 <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => handleEdit(product)}>
                                     <Edit className="w-3 h-3" /> Editar
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(product.id)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget({ id: product.id, label: product.nome })}>
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>
@@ -232,6 +226,23 @@ export default function AdminProducts() {
                     <div className="col-span-full text-center py-12 text-muted-foreground">Nenhum produto encontrado.</div>
                 )}
             </div>
+
+            <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Eliminar produto?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem a certeza que quer eliminar <strong>{deleteTarget?.label}</strong>? Esta acção não pode ser revertida.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { handleDelete(deleteTarget.id); setDeleteTarget(null); }}>
+                            Eliminar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

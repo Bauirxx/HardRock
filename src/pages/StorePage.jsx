@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
@@ -7,32 +8,46 @@ import ProductCard from '../components/store/ProductCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, SlidersHorizontal, Package } from 'lucide-react';
+import { Search, SlidersHorizontal, Package, Dumbbell, Pill, ShoppingBag, Shirt } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { SkeletonCard } from '@/components/ui/skeleton';
 
 const CATEGORIES = [
-    { value: 'all', label: 'Todos' },
-    { value: 'supplement', label: 'Suplementos' },
-    { value: 'clothing', label: 'Roupas' },
-    { value: 'accessory', label: 'Acessórios' },
+    { value: 'all', label: 'Todos', icon: Package },
+    { value: 'EQUIPAMENTO', label: 'Equipamentos', icon: Dumbbell },
+    { value: 'SUPLEMENTO', label: 'Suplementos', icon: Pill },
+    { value: 'ACESSORIO', label: 'Acessórios', icon: ShoppingBag },
+    { value: 'VESTUARIO', label: 'Vestuário', icon: Shirt },
 ];
 
 export default function StorePage() {
+    const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('all');
+    const [category, setCategory] = useState(searchParams.get('categoria') || 'all');
 
     useEffect(() => {
-        base44.entities.Product.filter({ status: 'active', is_machine: false })
+        base44.entities.Product.list('-created_date', 100)
             .then(setProducts)
             .catch(() => { })
             .finally(() => setLoading(false));
     }, []);
 
+    // Se vier ?categoria=X (dos cartões de categoria), aplicar o filtro
+    useEffect(() => {
+        const cat = searchParams.get('categoria');
+        if (cat) setCategory(cat);
+    }, [searchParams]);
+
     const filtered = products.filter(p => {
-        const matchSearch = p.nome?.toLowerCase().includes(search.toLowerCase());
-        const matchCat = category === 'all' || p.tipo === category;
+        const matchSearch = !search || p.nome?.toLowerCase().includes(search.toLowerCase());
+        const cat = p.categoria || p.category;
+        // Máquinas (is_machine / tipo=machine) contam como Equipamentos
+        const ehEquipamento = p.is_machine || p.tipo === 'machine' || cat === 'EQUIPAMENTO';
+        const matchCat = category === 'all'
+            || cat === category
+            || (category === 'EQUIPAMENTO' && ehEquipamento);
         return matchSearch && matchCat;
     });
 
@@ -59,16 +74,21 @@ export default function StorePage() {
                             />
                         </div>
                         <div className="flex gap-2 flex-wrap">
-                            {CATEGORIES.map(cat => (
-                                <Button
-                                    key={cat.value}
-                                    variant={category === cat.value ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setCategory(cat.value)}
-                                >
-                                    {cat.label}
-                                </Button>
-                            ))}
+                            {CATEGORIES.map(cat => {
+                                const Icon = cat.icon;
+                                return (
+                                    <Button
+                                        key={cat.value}
+                                        variant={category === cat.value ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setCategory(cat.value)}
+                                        className="gap-1.5"
+                                    >
+                                        <Icon className="w-3.5 h-3.5" />
+                                        {cat.label}
+                                    </Button>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -76,7 +96,7 @@ export default function StorePage() {
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {Array.from({ length: 8 }).map((_, i) => (
-                                <div key={i} className="rounded-xl bg-muted animate-pulse aspect-[3/4]" />
+                                <SkeletonCard key={i} />
                             ))}
                         </div>
                     ) : filtered.length === 0 ? (

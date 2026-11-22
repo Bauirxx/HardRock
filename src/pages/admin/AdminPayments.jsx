@@ -2,24 +2,66 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, CreditCard, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, CreditCard, CheckCircle, Clock } from 'lucide-react';
 import moment from 'moment';
 import { useToast } from '@/hooks/use-toast';
 
+const emptyPaymentForm = {
+    user: '', valor: '', tipo: 'mensalidade', metodo: 'dinheiro',
+    descricao: '', status: 'completed',
+};
+
 export default function AdminPayments() {
     const [payments, setPayments] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [form, setForm] = useState(emptyPaymentForm);
+    const [saving, setSaving] = useState(false);
     const { toast } = useToast();
 
-    useEffect(() => { loadPayments(); }, []);
+    useEffect(() => {
+        loadPayments();
+        base44.entities.User.filter({ role: 'internal_client' })
+            .then(u => setUsers(u))
+            .catch(() => {});
+    }, []);
 
     const loadPayments = async () => {
         const data = await base44.entities.Payment.list('-created_date', 100);
         setPayments(data);
         setLoading(false);
+    };
+
+    const handleCreate = async () => {
+        if (!form.user || !form.valor) {
+            toast({ variant: 'destructive', title: 'Utilizador e valor são obrigatórios.' });
+            return;
+        }
+        setSaving(true);
+        try {
+            await base44.entities.Payment.create({
+                user: form.user,
+                valor: parseFloat(form.valor),
+                tipo: form.tipo,
+                metodo: form.metodo,
+                descricao: form.descricao || form.tipo,
+                status: form.status,
+                data_pagamento: form.status === 'completed' ? new Date().toISOString() : null,
+            });
+            toast({ title: 'Pagamento registado!' });
+            setDialogOpen(false);
+            setForm(emptyPaymentForm);
+            loadPayments();
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro', description: err.message });
+        } finally { setSaving(false); }
     };
 
     const updateStatus = async (id, status) => {
@@ -34,9 +76,81 @@ export default function AdminPayments() {
 
     return (
         <div>
-            <div className="mb-6">
-                <h1 className="text-2xl font-space font-bold">Pagamentos</h1>
-                <p className="text-muted-foreground text-sm">{payments.length} pagamentos registados</p>
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="text-2xl font-space font-bold">Pagamentos</h1>
+                    <p className="text-muted-foreground text-sm">{payments.length} pagamentos registados</p>
+                </div>
+                <Dialog open={dialogOpen} onOpenChange={open => { setDialogOpen(open); if (!open) setForm(emptyPaymentForm); }}>
+                    <DialogTrigger asChild>
+                        <Button className="gap-2"><Plus className="w-4 h-4" /> Registar Pagamento</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader><DialogTitle>Registar Pagamento Manual</DialogTitle></DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label>Membro *</Label>
+                                <Select value={form.user} onValueChange={v => setForm({ ...form, user: v })}>
+                                    <SelectTrigger><SelectValue placeholder="Escolher membro..." /></SelectTrigger>
+                                    <SelectContent>
+                                        {users.map(u => <SelectItem key={u.id} value={u.id}>{u.full_name} — {u.email}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label>Valor (MZN) *</Label>
+                                    <Input type="number" placeholder="0.00" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} />
+                                </div>
+                                <div>
+                                    <Label>Estado</Label>
+                                    <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="completed">Concluído</SelectItem>
+                                            <SelectItem value="pending">Pendente</SelectItem>
+                                            <SelectItem value="failed">Falhado</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <Label>Tipo</Label>
+                                    <Select value={form.tipo} onValueChange={v => setForm({ ...form, tipo: v })}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="mensalidade">Mensalidade</SelectItem>
+                                            <SelectItem value="inscricao">Inscrição</SelectItem>
+                                            <SelectItem value="personal">Personal Trainer</SelectItem>
+                                            <SelectItem value="outro">Outro</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label>Método</Label>
+                                    <Select value={form.metodo} onValueChange={v => setForm({ ...form, metodo: v })}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                                            <SelectItem value="mpesa">M-Pesa</SelectItem>
+                                            <SelectItem value="emola">E-Mola</SelectItem>
+                                            <SelectItem value="transferencia">Transferência</SelectItem>
+                                            <SelectItem value="cartao">Cartão</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div>
+                                <Label>Descrição</Label>
+                                <Input placeholder="Ex: Mensalidade Junho 2026" value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} />
+                            </div>
+                            <Button className="w-full" onClick={handleCreate} disabled={saving}>
+                                {saving ? 'A registar...' : 'Registar Pagamento'}
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Summary Cards */}

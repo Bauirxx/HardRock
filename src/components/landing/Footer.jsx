@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
-import { Dumbbell, MapPin, Clock, Phone, Mail, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Dumbbell, MapPin, Clock, Phone, Mail, Instagram, Facebook, Youtube, MessageCircle } from 'lucide-react';
+import { useSiteConfig } from '@/lib/useSiteConfig';
 
 // Inline X (Twitter) icon — Lucide has no official "X" yet.
 function XIcon(props) {
@@ -11,68 +11,64 @@ function XIcon(props) {
     );
 }
 
-const CONTACTS = {
-    whatsapp: '+258 84 000 0000',
-    whatsappUrl: 'https://wa.me/258840000000',
-    facebook: 'https://facebook.com/hardrockgym',
-    instagram: 'https://instagram.com/hardrockgym',
-    x: 'https://x.com/hardrockgym',
-    email: 'info@hardrockgym.co.mz',
-    address: 'Av. 24 de Julho, Maputo',
-};
-
-const socials = [
-    { href: CONTACTS.whatsappUrl, label: 'WhatsApp', Icon: MessageCircle },
-    { href: CONTACTS.facebook, label: 'Facebook', Icon: Facebook },
-    { href: CONTACTS.instagram, label: 'Instagram', Icon: Instagram },
-    { href: CONTACTS.x, label: 'X', Icon: XIcon },
+const HORARIO_FALLBACK = [
+    { dia: 'Seg - Sex', horas: '06h - 22h' },
+    { dia: 'Sábado', horas: '08h - 18h' },
+    { dia: 'Domingo', horas: '08h - 14h' },
 ];
 
-export default function Footer() {
-    return (
-        <footer className="bg-sidebar text-sidebar-foreground">
-=======
-import { Dumbbell, MapPin, Clock, Phone, Mail, Instagram } from 'lucide-react';
+function normalizarUrl(base, valor) {
+    if (!valor) return null;
+    if (valor.startsWith('http')) return valor;
+    // aceita @handle ou username
+    return base + valor.replace(/^@/, '');
+}
 
 export default function Footer() {
+    const cfg = useSiteConfig();
+
+    const nome = cfg.nome || 'Hard Rock Gym';
+    const descricao = cfg.descricao
+        || 'O seu parceiro na jornada de transformação física e mental. Equipamento de ponta e profissionais dedicados.';
+    const telefone = cfg.whatsapp_number || cfg.telefone;
+    const email = cfg.email_notificacao;
+    const endereco = cfg.endereco;
+    const horarios = (Array.isArray(cfg.horarios) && cfg.horarios.length > 0) ? cfg.horarios : HORARIO_FALLBACK;
+    const redes = cfg.redes_sociais || {};
+
+    const whatsappUrl = telefone
+        ? `https://wa.me/${String(telefone).replace(/[^0-9]/g, '')}`
+        : null;
+
+    const socials = [
+        whatsappUrl && { href: whatsappUrl, label: 'WhatsApp', Icon: MessageCircle },
+        redes.facebook && { href: normalizarUrl('https://facebook.com/', redes.facebook), label: 'Facebook', Icon: Facebook },
+        redes.instagram && { href: normalizarUrl('https://instagram.com/', redes.instagram), label: 'Instagram', Icon: Instagram },
+        redes.youtube && { href: normalizarUrl('https://youtube.com/', redes.youtube), label: 'YouTube', Icon: Youtube },
+        (redes.twitter || redes.x) && { href: normalizarUrl('https://x.com/', redes.twitter || redes.x), label: 'X', Icon: XIcon },
+    ].filter(Boolean);
+
     return (
-        <footer className="bg-foreground text-background">
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
+        <footer className="bg-sidebar text-sidebar-foreground">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     <div>
                         <div className="flex items-center gap-2 mb-4">
-<<<<<<< HEAD
                             <div className="w-10 h-10 rounded-xl brand-gradient flex items-center justify-center shadow-lg shadow-primary/30">
                                 <Dumbbell className="w-5 h-5 text-white" />
-=======
-                            <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border border-primary">
-                                <Dumbbell className="w-5 h-5 text-primary" />
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                             </div>
                             <span className="font-space font-bold text-xl uppercase tracking-tighter italic">
-                                <span className="text-primary">Hard Rock</span>{' '}
-                                <span>Gym</span>
+                                {nome}
                             </span>
                         </div>
-<<<<<<< HEAD
-                        <p className="text-sm text-sidebar-foreground/70 leading-relaxed">
-=======
-                        <p className="text-sm text-background/60 leading-relaxed">
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
-                            O seu parceiro na jornada de transformação física e mental.
-                            Equipamento de ponta e profissionais dedicados.
-                        </p>
+                        <p className="text-sm text-sidebar-foreground/70 leading-relaxed">{descricao}</p>
                     </div>
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Links Rápidos</h4>
-<<<<<<< HEAD
                         <div className="space-y-2 text-sm text-sidebar-foreground/70">
-=======
-                        <div className="space-y-2 text-sm text-background/60">
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                             <Link to="/loja" className="block hover:text-primary transition-colors">Loja</Link>
+                            <Link to="/ginasio" className="block hover:text-primary transition-colors">Ginásio</Link>
                             <Link to="/equipamentos" className="block hover:text-primary transition-colors">Equipamentos</Link>
                             <Link to="/cliente" className="block hover:text-primary transition-colors">Área do Cliente</Link>
                             <Link to="/rastreio" className="block hover:text-primary transition-colors">Rastreio de Encomenda</Link>
@@ -81,94 +77,71 @@ export default function Footer() {
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Contacto</h4>
-<<<<<<< HEAD
                         <div className="space-y-3 text-sm text-sidebar-foreground/70">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                                <span>{CONTACTS.address}</span>
-                            </div>
-                            <a href={CONTACTS.whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
-                                <Phone className="w-4 h-4 text-primary shrink-0" />
-                                <span>{CONTACTS.whatsapp}</span>
-                            </a>
-                            <a href={`mailto:${CONTACTS.email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                                <Mail className="w-4 h-4 text-primary shrink-0" />
-                                <span>{CONTACTS.email}</span>
-                            </a>
-=======
-                        <div className="space-y-3 text-sm text-background/60">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                                <span>Av. 24 de Julho, Maputo</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-primary shrink-0" />
-                                <span>+258 84 000 0000</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4 text-primary shrink-0" />
-                                <span>info@fitgym.co.mz</span>
-                            </div>
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
+                            {endereco && (
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                                    <span>{endereco}</span>
+                                </div>
+                            )}
+                            {telefone && (
+                                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                                    <Phone className="w-4 h-4 text-primary shrink-0" />
+                                    <span>{telefone}</span>
+                                </a>
+                            )}
+                            {email && (
+                                <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                    <Mail className="w-4 h-4 text-primary shrink-0" />
+                                    <span>{email}</span>
+                                </a>
+                            )}
+                            {!endereco && !telefone && !email && (
+                                <p className="text-sidebar-foreground/50">Configure os contactos nas Definições.</p>
+                            )}
                         </div>
                     </div>
 
                     <div>
                         <h4 className="font-space font-semibold mb-4">Horário</h4>
-<<<<<<< HEAD
-                        <div className="space-y-2 text-sm text-sidebar-foreground/70">
-                            <div className="flex items-start gap-2">
-                                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-=======
-                        <div className="space-y-2 text-sm text-background/60">
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-primary shrink-0" />
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
-                                <div>
-                                    <p>Seg - Sex: 06h - 22h</p>
-                                    <p>Sáb: 08h - 18h</p>
-                                    <p>Dom: 08h - 14h</p>
-                                </div>
+                        <div className="flex items-start gap-2 text-sm text-sidebar-foreground/70">
+                            <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                            <div>
+                                {horarios.map((h, i) => (
+                                    <p key={i}>{h.dia}{h.horas ? `: ${h.horas}` : ''}</p>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
 
-<<<<<<< HEAD
                 <div className="border-t border-sidebar-border mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-sm text-sidebar-foreground/50">
-                        © {new Date().getFullYear()} Hard Rock Gym. Todos os direitos reservados.
-                    </p>
-                    <div className="flex items-center gap-3">
-                        {socials.map(({ href, label, Icon }) => (
-                            <a
-                                key={label}
-                                href={href}
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label={label}
-                                className="w-9 h-9 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors"
-                            >
-                                <Icon className="w-4 h-4" />
-                            </a>
-                        ))}
-=======
-                <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-sm text-background/40">
-                        © {new Date().getFullYear()} Lárius Sport. Todos os direitos reservados.
-                    </p>
-                    <div className="flex items-center gap-3">
-                        <a href="#" className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
-                            <Instagram className="w-4 h-4" />
-                        </a>
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
+                    <div className="text-center sm:text-left">
+                        <p className="text-sm text-sidebar-foreground/50">
+                            © {new Date().getFullYear()} {nome}. Todos os direitos reservados.
+                        </p>
+                        <p className="text-xs text-sidebar-foreground/40 mt-1">
+                            Desenvolvido por <span className="text-primary font-medium">Arsénio Francisco Baquir</span>
+                        </p>
                     </div>
+                    {socials.length > 0 && (
+                        <div className="flex items-center gap-3">
+                            {socials.map(({ href, label, Icon }) => (
+                                <a
+                                    key={label}
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label={label}
+                                    className="w-9 h-9 rounded-full bg-sidebar-accent border border-sidebar-border flex items-center justify-center hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors"
+                                >
+                                    <Icon className="w-4 h-4" />
+                                </a>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </footer>
     );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3

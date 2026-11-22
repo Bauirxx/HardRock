@@ -8,25 +8,35 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-<<<<<<< HEAD
 import { Dumbbell, MessageCircle, Info, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube';
-=======
-import { Dumbbell, MessageCircle, Info, Package } from 'lucide-react';
-import { motion } from 'framer-motion';
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
+import { useSiteConfig } from '@/lib/useSiteConfig';
 
 export default function EquipmentPage() {
+    const cfg = useSiteConfig();
+    const waNumero = (cfg.whatsapp_number || cfg.telefone || '').replace(/[^0-9]/g, '');
     const [equipment, setEquipment] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        base44.entities.Product.filter({ is_machine: true, status: 'active' })
-            .then(setEquipment)
-            .catch(() => { })
+    const loadEquipment = () => {
+        setLoading(true);
+        setError(null);
+        base44.entities.Product.list('-created_date', 100)
+            .then(all => {
+                const machines = (Array.isArray(all) ? all : []).filter(p =>
+                    p.is_machine ||
+                    p.tipo === 'machine' ||
+                    p.tipo === 'equipment'
+                );
+                setEquipment(machines);
+            })
+            .catch(err => setError(err.message || 'Erro de ligação'))
             .finally(() => setLoading(false));
-    }, []);
+    };
+
+    useEffect(() => { loadEquipment(); }, []);
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -44,11 +54,18 @@ export default function EquipmentPage() {
                                 <div key={i} className="rounded-xl bg-muted animate-pulse aspect-[4/5]" />
                             ))}
                         </div>
+                    ) : error ? (
+                        <div className="text-center py-24">
+                            <Dumbbell className="w-16 h-16 text-destructive/40 mx-auto mb-4" />
+                            <h3 className="font-space font-semibold text-lg mb-2">Erro ao carregar</h3>
+                            <p className="text-muted-foreground mb-4">{error}</p>
+                            <Button onClick={loadEquipment}>Tentar novamente</Button>
+                        </div>
                     ) : equipment.length === 0 ? (
                         <div className="text-center py-24">
                             <Dumbbell className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                            <h3 className="font-space font-semibold text-lg mb-2">Catálogo em breve</h3>
-                            <p className="text-muted-foreground">O catálogo de equipamentos está a ser actualizado.</p>
+                            <h3 className="font-space font-semibold text-lg mb-2">Sem equipamentos registados</h3>
+                            <p className="text-muted-foreground">Ainda não há equipamentos cadastrados com tipo "Máquina" ou "Equipamento".</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -63,11 +80,8 @@ export default function EquipmentPage() {
                                         <div className="aspect-square relative overflow-hidden bg-muted">
                                             {item.imagens?.[0] ? (
                                                 <img src={item.imagens[0]} alt={item.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-<<<<<<< HEAD
                                             ) : getYouTubeThumbnail(item.youtube_url) ? (
                                                 <img src={getYouTubeThumbnail(item.youtube_url)} alt={item.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
                                                     <Dumbbell className="w-16 h-16 text-muted-foreground/20" />
@@ -76,14 +90,11 @@ export default function EquipmentPage() {
                                             {item.sob_consulta && (
                                                 <Badge variant="secondary" className="absolute top-3 right-3">Sob Consulta</Badge>
                                             )}
-<<<<<<< HEAD
                                             {getYouTubeEmbedUrl(item.youtube_url) && (
                                                 <Badge className="absolute top-3 left-3 gap-1 bg-red-600 hover:bg-red-700">
                                                     <PlayCircle className="w-3 h-3" /> Vídeo
                                                 </Badge>
                                             )}
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                         </div>
                                         <CardContent className="p-5">
                                             <h3 className="font-space font-semibold text-lg mb-1">{item.nome}</h3>
@@ -102,16 +113,11 @@ export default function EquipmentPage() {
                                                             <Info className="w-4 h-4" /> Ficha Técnica
                                                         </Button>
                                                     </DialogTrigger>
-<<<<<<< HEAD
                                                     <DialogContent className="max-w-2xl">
-=======
-                                                    <DialogContent>
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                         <DialogHeader>
                                                             <DialogTitle>{item.nome}</DialogTitle>
                                                         </DialogHeader>
                                                         <div className="space-y-3">
-<<<<<<< HEAD
                                                             {getYouTubeEmbedUrl(item.youtube_url) && (
                                                                 <div className="aspect-video rounded-lg overflow-hidden bg-black">
                                                                     <iframe
@@ -123,8 +129,6 @@ export default function EquipmentPage() {
                                                                     />
                                                                 </div>
                                                             )}
-=======
->>>>>>> 178c6066442bcf30bce830b8deda6700021cb4a3
                                                             {item.descricao && <p className="text-muted-foreground">{item.descricao}</p>}
                                                             {item.ficha_tecnica && Object.keys(item.ficha_tecnica).length > 0 && (
                                                                 <div className="space-y-2">
@@ -140,11 +144,13 @@ export default function EquipmentPage() {
                                                         </div>
                                                     </DialogContent>
                                                 </Dialog>
-                                                <a href={`https://wa.me/258840000000?text=${encodeURIComponent(`Olá! Tenho interesse no equipamento: ${item.nome}`)}`} target="_blank" rel="noopener noreferrer">
-                                                    <Button size="sm" className="gap-1">
-                                                        <MessageCircle className="w-4 h-4" /> Contactar
-                                                    </Button>
-                                                </a>
+                                                {waNumero && (
+                                                    <a href={`https://wa.me/${waNumero}?text=${encodeURIComponent(`Olá! Tenho interesse no equipamento: ${item.nome}`)}`} target="_blank" rel="noopener noreferrer">
+                                                        <Button size="sm" className="gap-1">
+                                                            <MessageCircle className="w-4 h-4" /> Contactar
+                                                        </Button>
+                                                    </a>
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>

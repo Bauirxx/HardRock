@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Star, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentTenantId } from '@/lib/tenantStore';
 
@@ -17,6 +18,7 @@ export default function AdminTestimonials() {
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [form, setForm] = useState({ nome: '', texto: '', stars: 5, status: 'approved' });
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const { toast } = useToast();
 
     useEffect(() => { loadData(); }, []);
@@ -116,7 +118,7 @@ export default function AdminTestimonials() {
                                         <SelectItem value="rejected">Rejeitado</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(t.id)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget({ id: t.id, label: t.nome })}>
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>
@@ -127,6 +129,23 @@ export default function AdminTestimonials() {
                     <div className="text-center py-12 text-muted-foreground">Nenhum depoimento.</div>
                 )}
             </div>
+
+            <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Eliminar depoimento?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tem a certeza que quer eliminar o depoimento de <strong>{deleteTarget?.label}</strong>? Esta acção não pode ser revertida.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { handleDelete(deleteTarget.id); setDeleteTarget(null); }}>
+                            Eliminar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

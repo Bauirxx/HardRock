@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+  rabbitmq:
+    host: gym-rabbitmq
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://gym-eureka:8761/eureka/

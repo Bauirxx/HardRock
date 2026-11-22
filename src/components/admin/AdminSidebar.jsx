@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Package, ShoppingCart, CreditCard,
-    UserPlus, FileText, Settings, Dumbbell, ChevronLeft, MessageSquare
+    UserPlus, Settings, Dumbbell, ChevronLeft, MessageSquare,
+    CalendarCheck, BadgeCheck, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -10,11 +11,12 @@ const menuItems = [
     { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/clientes', icon: Users, label: 'Clientes' },
     { to: '/admin/trainers', icon: Dumbbell, label: 'Personal Trainers' },
+    { to: '/admin/subscricoes', icon: CalendarCheck, label: 'Subscrições' },
+    { to: '/admin/servicos', icon: BadgeCheck, label: 'Planos & Serviços' },
     { to: '/admin/produtos', icon: Package, label: 'Produtos' },
     { to: '/admin/encomendas', icon: ShoppingCart, label: 'Encomendas' },
     { to: '/admin/pagamentos', icon: CreditCard, label: 'Pagamentos' },
     { to: '/admin/leads', icon: UserPlus, label: 'Leads' },
-    { to: '/admin/servicos', icon: Dumbbell, label: 'Serviços' },
     { to: '/admin/depoimentos', icon: MessageSquare, label: 'Depoimentos' },
     { to: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
 ];
@@ -32,10 +34,19 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                     <Dumbbell className="w-4 h-4 text-primary" />
                 </div>
                 {!collapsed && (
-                    <span className="font-space font-bold text-lg uppercase tracking-tighter italic">
+                    <span className="font-space font-bold text-lg uppercase tracking-tighter italic flex-1">
                         <span className="text-primary">Hard Rock</span> Gym
                     </span>
                 )}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onToggle}
+                    className="shrink-0 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent w-8 h-8"
+                    title={collapsed ? 'Expandir menu' : 'Colapsar menu'}
+                >
+                    {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                </Button>
             </div>
 
             <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
@@ -70,6 +81,12 @@ export default function AdminSidebar({ collapsed, onToggle }) {
                         {!collapsed && <span>Voltar ao Site</span>}
                     </Button>
                 </Link>
+                {!collapsed && (
+                    <p className="text-[10px] text-center text-sidebar-foreground/40 mt-2 px-2">
+                        Desenvolvido por<br />
+                        <span className="text-primary font-medium">Arsénio Francisco Baquir</span>
+                    </p>
+                )}
             </div>
         </aside>
     );

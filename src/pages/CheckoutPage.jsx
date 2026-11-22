@@ -27,52 +27,91 @@ export default function CheckoutPage() {
 
     const updateField = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
+    // Métodos que pagam online via PaySuite (cash = pagamento na entrega)
+    const METODO_ONLINE = { mpesa: 'mpesa', emola: 'emola', card: 'credit_card' };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        const code = generateTrackingCode();
+        try {
+            const code = generateTrackingCode();
 
-        await base44.entities.Order.create({
-            tenant_id: getCurrentTenantId() || 'default',
-            guest_name: form.nome,
-            guest_email: form.email,
-            guest_phone: form.telefone,
-            endereco_entrega: {
-                rua: form.rua,
-                cidade: form.cidade,
-                codigo_postal: form.codigo_postal,
-                pais: 'Moçambique',
-            },
-            items: cart.items.map(i => ({
-                product_id: i.product_id,
-                nome: i.nome,
-                preco: i.preco,
-                quantidade: i.quantidade,
-                imagem: i.imagem,
-            })),
-            subtotal: cart.total,
-            taxa_entrega: 0,
-            total: cart.total,
-            metodo_pagamento: paymentMethod,
-            status: 'pending',
-            status_pagamento: 'pending',
-            tracking_code: code,
-        });
+            // Ligar a encomenda ao cliente logado (se existir perfil de cliente)
+            let clienteId = null;
+            try {
+                const me = await base44.auth.me();
+                if (me?.id) {
+                    const clients = await base44.entities.Client.list('-created_date', 500);
+                    clienteId = clients.find(c => c.user_id === me.id)?.id || null;
+                }
+            } catch { /* compra como convidado */ }
 
-        await base44.entities.Payment.create({
-            tenant_id: getCurrentTenantId() || 'default',
-            tipo: 'produto',
-            descricao: `Encomenda ${code} - ${cart.count} item(s)`,
-            valor: cart.total,
-            metodo: paymentMethod,
-            status: 'pending',
-        });
+            const order = await base44.entities.Order.create({
+                cliente_id: clienteId,
+                tenant_id: getCurrentTenantId() || 'default',
+                guest_name: form.nome,
+                guest_email: form.email,
+                guest_phone: form.telefone,
+                endereco_entrega: {
+                    rua: form.rua,
+                    cidade: form.cidade,
+                    codigo_postal: form.codigo_postal,
+                    pais: 'Moçambique',
+                },
+                items: cart.items.map(i => ({
+                    product_id: i.product_id,
+                    nome: i.nome,
+                    preco: i.preco,
+                    quantidade: i.quantidade,
+                    imagem: i.imagem,
+                })),
+                subtotal: cart.total,
+                taxa_entrega: 0,
+                total: cart.total,
+                metodo_pagamento: paymentMethod,
+                status: 'pending',
+                status_pagamento: 'pending',
+                tracking_code: code,
+            });
 
-        setTrackingCode(code);
-        setSuccess(true);
-        clearCart();
-        setLoading(false);
+            const metodoOnline = METODO_ONLINE[paymentMethod];
+            if (metodoOnline) {
+                // Pagamento online → iniciar checkout PaySuite e redirecionar
+                const { checkout_url } = await base44.payments.checkout({
+                    valor: cart.total,
+                    metodo: metodoOnline,
+                    contexto: 'VENDA',
+                    contexto_id: order?.id,
+                    cliente_id: clienteId,
+                    descricao: `Encomenda ${code} — ${cart.count} item(s)`,
+                    return_url: `${window.location.origin}/pagamento/retorno?code=${code}`,
+                });
+                clearCart();
+                if (checkout_url) {
+                    window.location.href = checkout_url;
+                    return;
+                }
+            }
+
+            // Dinheiro na entrega → confirmar sem gateway
+            await base44.entities.Payment.create({
+                tenant_id: getCurrentTenantId() || 'default',
+                tipo: 'produto',
+                descricao: `Encomenda ${code} - ${cart.count} item(s)`,
+                valor: cart.total,
+                metodo: paymentMethod,
+                status: 'pending',
+            }).catch(() => {});
+
+            setTrackingCode(code);
+            setSuccess(true);
+            clearCart();
+        } catch (err) {
+            alert('Não foi possível processar o pagamento: ' + (err?.message || 'erro'));
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (success) {

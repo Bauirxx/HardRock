@@ -20,9 +20,10 @@ export default function ProductDetailPage() {
     const { toast } = useToast();
 
     useEffect(() => {
-        base44.entities.Product.filter({ id })
-            .then(items => setProduct(items[0]))
-            .catch(() => { })
+        setLoading(true);
+        base44.entities.Product.get(id)
+            .then(setProduct)
+            .catch(() => setProduct(null))
             .finally(() => setLoading(false));
     }, [id]);
 

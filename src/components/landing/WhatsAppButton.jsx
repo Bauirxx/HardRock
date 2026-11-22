@@ -1,8 +1,15 @@
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useSiteConfig } from '@/lib/useSiteConfig';
 
-export default function WhatsAppButton({ phone = "258840000000" }) {
-    const url = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Olá! Gostaria de saber mais informações sobre o ginásio.')}`;
+export default function WhatsAppButton({ phone }) {
+    const cfg = useSiteConfig();
+    const numero = phone || cfg.whatsapp_number || cfg.telefone;
+
+    // Sem número configurado → não mostra o botão
+    if (!numero) return null;
+
+    const url = `https://wa.me/${String(numero).replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Olá! Gostaria de saber mais informações sobre o ginásio.')}`;
 
     return (
         <motion.a

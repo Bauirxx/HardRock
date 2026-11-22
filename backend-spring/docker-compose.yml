@@ -1,0 +1,337 @@
+# ============================================================
+# Gym Management System — Docker Compose
+#
+# Portas:
+#   8761 — Eureka Server (Service Discovery)
+#   8080 — API Gateway (ponto de entrada único)
+#   8081 — Auth Service
+#   8082 — Member Service (futuro)
+#   8083 — Gym Service (futuro)
+#   8084 — Store Service (futuro)
+#   8085 — Notification Service (futuro)
+#   8086 — History Service (futuro)
+#   5433 — PostgreSQL
+#   15672 — RabbitMQ Management
+#
+# Execução:
+#   docker compose up -d --build
+# ============================================================
+
+services:
+
+  # ─── INFRAESTRUTURA ─────────────────────────────────────────
+
+  gym-postgres:
+    image: postgres:15-alpine
+    container_name: gym-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - gym_postgres_data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  gym-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gym-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "15672:15672"
+    volumes:
+      - gym_rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── EUREKA SERVER ──────────────────────────────────────────
+
+  gym-eureka:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: gym-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8761/actuator/health | grep -qE '^200$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ─── AUTH SERVICE ───────────────────────────────────────────
+
+  gym-auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: gym-auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── MEMBER SERVICE ─────────────────────────────────────────
+
+  gym-member-service:
+    build:
+      context: .
+      dockerfile: member-service/Dockerfile
+    container_name: gym-member-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8082/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── GYM SERVICE ────────────────────────────────────────────
+
+  gym-gym-service:
+    build:
+      context: .
+      dockerfile: gym-service/Dockerfile
+    container_name: gym-gym-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8083/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── STORE SERVICE ──────────────────────────────────────────
+
+  gym-store-service:
+    build:
+      context: .
+      dockerfile: store-service/Dockerfile
+    container_name: gym-store-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8084/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── NOTIFICATION SERVICE ──────────────────────────────────
+
+  gym-notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: gym-notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      APP_NAME: ${APP_NAME:-Hard Rock Gym}
+    depends_on:
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8085/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── HISTORY SERVICE ───────────────────────────────────────
+
+  gym-history-service:
+    build:
+      context: .
+      dockerfile: history-service/Dockerfile
+    container_name: gym-history-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8086/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── PAYMENT SERVICE ───────────────────────────────────────
+
+  gym-payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: gym-payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      JWT_SECRET: ${JWT_SECRET:-gym-management-super-secret-key-that-is-at-least-256-bits-long}
+      PAYSUITE_TOKEN: ${PAYSUITE_TOKEN:-}
+      PAYSUITE_WEBHOOK_SECRET: ${PAYSUITE_WEBHOOK_SECRET:-}
+      PAYSUITE_CALLBACK_URL: ${PAYSUITE_CALLBACK_URL:-}
+      PAYSUITE_RETURN_URL: ${PAYSUITE_RETURN_URL:-http://localhost:3000/pagamento/retorno}
+    depends_on:
+      gym-postgres:
+        condition: service_healthy
+      gym-rabbitmq:
+        condition: service_healthy
+      gym-eureka:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8087/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── API GATEWAY ────────────────────────────────────────────
+
+  gym-api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: gym-api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      gym-auth-service:
+        condition: service_healthy
+    networks:
+      - gym-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health | grep -qE '^(200|403)$'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+networks:
+  gym-network:
+    driver: bridge
+
+volumes:
+  gym_postgres_data:
+  gym_rabbitmq_data:

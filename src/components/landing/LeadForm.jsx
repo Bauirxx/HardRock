@@ -55,9 +55,9 @@ export default function LeadForm() {
                             encontrar o plano perfeito para si.
                         </p>
                         <div className="space-y-3 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Primeira semana gratuita</div>
+                            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Aula experimental gratuita</div>
                             <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Sem compromisso inicial</div>
-                            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Planos a partir de 2.500 MZN</div>
+                            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Acompanhamento personalizado</div>
                         </div>
                     </motion.div>
 

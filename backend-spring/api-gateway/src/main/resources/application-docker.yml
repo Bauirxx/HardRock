@@ -1,0 +1,56 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: http://gym-auth-service:8081
+              predicates:
+                - Path=/api/v1/auth/**
+              filters:
+                - StripPrefix=0
+            - id: member-service
+              uri: http://gym-member-service:8082
+              predicates:
+                - Path=/api/v1/clientes/**,/api/v1/personal-trainers/**,/api/v1/leads/**,/api/v1/sessoes/**,/api/v1/notificacoes/**
+              filters:
+                - StripPrefix=0
+            - id: gym-service
+              uri: http://gym-gym-service:8083
+              predicates:
+                - Path=/api/v1/servicos/**,/api/v1/planos/**,/api/v1/testemunhos/**,/api/v1/pagamentos/**,/api/v1/configuracoes/**
+              filters:
+                - StripPrefix=0
+            - id: store-service
+              uri: http://gym-store-service:8084
+              predicates:
+                - Path=/api/v1/produtos/**,/api/v1/vendas/**
+              filters:
+                - StripPrefix=0
+            - id: notification-service
+              uri: http://gym-notification-service:8085
+              predicates:
+                - Path=/api/v1/email/**
+              filters:
+                - StripPrefix=0
+            - id: payment-service
+              uri: http://gym-payment-service:8087
+              predicates:
+                - Path=/api/v1/checkout/**
+              filters:
+                - StripPrefix=0
+            - id: history-service
+              uri: http://gym-history-service:8086
+              predicates:
+                - Path=/api/v1/historico/**
+              filters:
+                - StripPrefix=0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://gym-eureka:8761/eureka/
