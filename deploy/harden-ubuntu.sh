@@ -20,12 +20,23 @@ log "1/7 — Atualizar sistema e instalar pacotes"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get upgrade -y
+
+# Repo oficial Docker (docker-compose-plugin não está no repo nativo do Ubuntu 24.04)
+apt-get install -y ca-certificates curl gnupg
+install -m 0755 -d /etc/apt/keyrings
+if [[ ! -f /etc/apt/keyrings/docker.gpg ]]; then
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+fi
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+    > /etc/apt/sources.list.d/docker.list
+apt-get update -y
+
 apt-get install -y \
     unattended-upgrades apt-listchanges \
     fail2ban ufw \
-    docker.io docker-compose-plugin \
-    git curl ca-certificates \
-    chrony
+    docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
+    git chrony
 
 log "2/7 — Atualizações automáticas de segurança"
 cat >/etc/apt/apt.conf.d/50unattended-upgrades <<'EOF'
@@ -111,7 +122,7 @@ cat <<'TIP'
 ─────────────────────────────────────────────────────────
 Próximos passos:
   1. Logout + login SSH (para o grupo docker ficar activo)
-  2. git clone https://github.com/Bauirxx/HardRock-.git fitgym
+  2. git clone -b security/owasp-hardening https://github.com/Bauirxx/HardRock.git fitgym
   3. cd fitgym/backend-spring && cp .env.example .env && nano .env
   4. docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ─────────────────────────────────────────────────────────
