@@ -1,0 +1,52 @@
+# Override de PRODUÇÃO — adiciona Caddy (reverse proxy + HTTPS) e FECHA portas
+# internas (Postgres, RabbitMQ management, Eureka, API Gateway direto) que não
+# devem estar acessíveis externamente. OWASP A05 — Security Misconfiguration.
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Definir no .env:  SITE_ADDRESS=lariussport.duckdns.org
+services:
+
+  # ─── FECHAR PORTAS EXPOSTAS DOS SERVIÇOS INTERNOS ──────────
+  # Em dev (compose base) estas portas estão mapeadas para o host para debug.
+  # Em prod só o Caddy (80/443) fica exposto publicamente — tudo o resto fica
+  # na rede interna gym-network, inacessível de fora.
+
+  gym-postgres:
+    ports: !reset []        # fechar 5433:5432
+
+  gym-rabbitmq:
+    ports: !reset []        # fechar 15672 (management UI)
+
+  gym-eureka:
+    ports: !reset []        # fechar 8761 (service discovery)
+
+  gym-api-gateway:
+    ports: !reset []        # fechar 8080 (gateway acessível só via Caddy)
+
+  # ─── CADDY (reverse proxy + HTTPS automático) ──────────────
+
+  gym-web:
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+    container_name: gym-web
+    environment:
+      # Domínio real (DuckDNS) → HTTPS automático via Let's Encrypt.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - gym-api-gateway
+    networks:
+      - gym-network
+    restart: unless-stopped
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

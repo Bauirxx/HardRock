@@ -1,0 +1,67 @@
+# Caddy — serve o frontend (React) e encaminha /api para o API Gateway.
+# HTTPS automático (Let's Encrypt) quando SITE_ADDRESS for um domínio real.
+# Para teste local, SITE_ADDRESS = :80 (só HTTP).
+#
+# Hardening aplicado (OWASP A05 — Security Misconfiguration):
+#   - HSTS (força HTTPS por 1 ano, inclui subdomínios)
+#   - CSP (restringe origens de scripts/estilos; ajustar se adicionares mais CDNs)
+#   - X-Frame-Options DENY (previne clickjacking)
+#   - X-Content-Type-Options nosniff (previne MIME sniffing)
+#   - Referrer-Policy strict-origin-when-cross-origin
+#   - Permissions-Policy restritiva (nega câmara/microfone/geoloc por default)
+#   - Remove Server header (oculta "Caddy")
+
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# ─── Security headers globais ─────────────────────────────
+	header {
+		# HSTS — 1 ano, inclui subdomínios. Só é enviado em HTTPS pelo browser.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+		# Impede o site ser aberto dentro de <iframe> em outros sites (clickjacking)
+		X-Frame-Options "DENY"
+
+		# Impede browser de "adivinhar" o Content-Type (bloqueia polyglot attacks)
+		X-Content-Type-Options "nosniff"
+
+		# Só envia Referer para a mesma origem em cross-origin
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# Nega acesso a features sensíveis por default
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+		# CSP — ajustar quando adicionares CDNs. Em modo relatório primeiro se receares quebrar o frontend.
+		# 'unsafe-inline' em style-src e script-src são necessários para Vite/React dev — em build de produção podes reforçar.
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://paysuite.tech; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+		# Esconde que o servidor é Caddy
+		-Server
+		X-Powered-By ""
+	}
+
+	# Backend: API, uploads e webhook → gateway (mesma origem, sem CORS)
+	@backend path /api/* /uploads/*
+	handle @backend {
+		# Para o rate-limit do Spring saber o IP real do cliente
+		reverse_proxy gym-api-gateway:8080 {
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Frontend (SPA React) — todo o resto
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	# Logging
+	log {
+		output stdout
+		format console
+		level INFO
+	}
+}
