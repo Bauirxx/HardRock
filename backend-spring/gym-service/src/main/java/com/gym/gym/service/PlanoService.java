@@ -134,15 +134,26 @@ public class PlanoService {
         return PlanoDTO.from(plano);
     }
 
-    // Activa um plano após confirmação de pagamento pelo gateway
+    // Activa/renova um plano após confirmação de pagamento pelo gateway.
+    // Estende a validade pela duração original do plano (a partir da data de fim
+    // actual se ainda no futuro, ou a partir de hoje se já expirou).
     @Transactional
     public void activarPorPagamento(UUID planoId) {
         PlanoEntity plano = planoRepository.findById(planoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Plano", planoId));
-        if (plano.getEstado() == EstadoPlano.ACTIVO) return;
+
+        long dias = 30;
+        if (plano.getDataInicio() != null && plano.getDataFim() != null) {
+            long d = java.time.temporal.ChronoUnit.DAYS.between(plano.getDataInicio(), plano.getDataFim());
+            if (d > 0) dias = d;
+        }
+        LocalDate base = (plano.getDataFim() != null && plano.getDataFim().isAfter(LocalDate.now()))
+                ? plano.getDataFim() : LocalDate.now();
+        plano.setDataFim(base.plusDays(dias));
         plano.setEstado(EstadoPlano.ACTIVO);
         planoRepository.save(plano);
         publicarEvento("PLANO_ACTIVADO", plano);
+        log.info("[RENOVACAO] Plano {} renovado até {}", planoId, plano.getDataFim());
     }
 
     @Transactional

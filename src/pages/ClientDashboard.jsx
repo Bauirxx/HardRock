@@ -334,9 +334,34 @@ function InternalClientDashboard({ user, orders, clientProfile, payments, subscr
     const [showPw, setShowPw] = useState(false);
     const [savingPw, setSavingPw] = useState(false);
     const [showPlansModal, setShowPlansModal] = useState(false);
+    const [renovando, setRenovando] = useState(false);
     const { toast } = useToast();
 
     const activeSub = subscriptions.find(s => s.status === 'active');
+
+    const renovarPlano = async (sub) => {
+        if (!sub) return;
+        setRenovando(true);
+        try {
+            const { checkout_url } = await base44.payments.checkout({
+                valor: parseFloat(sub.valor_pago) || 0,
+                metodo: 'mpesa',
+                contexto: 'PLANO',
+                contexto_id: sub.id,
+                cliente_id: clientProfile?.id || sub.client_id,
+                descricao: `Renovação — ${sub.service_nome || 'Plano'}`,
+            });
+            if (checkout_url) {
+                window.location.href = checkout_url;
+            } else {
+                toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível iniciar o pagamento.' });
+            }
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro no pagamento', description: err.message });
+        } finally {
+            setRenovando(false);
+        }
+    };
     const upcomingSessions = sessions.filter(s => s.status === 'scheduled' && new Date(s.data) >= new Date()).slice(0, 5);
     const totalPaid = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + (parseFloat(p.valor) || 0), 0);
 
@@ -424,9 +449,15 @@ function InternalClientDashboard({ user, orders, clientProfile, payments, subscr
                                                 </div>
                                             </div>
                                             {activeSub.is_expiring_soon && (
-                                                <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm">
-                                                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                                                    O seu plano expira em breve! Contacte-nos para renovar.
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm">
+                                                    <div className="flex items-center gap-2 flex-1">
+                                                        <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                                                        O seu plano expira em breve! Renove para continuar a treinar.
+                                                    </div>
+                                                    <Button size="sm" className="gap-2 shrink-0" disabled={renovando} onClick={() => renovarPlano(activeSub)}>
+                                                        <CreditCard className="w-4 h-4" />
+                                                        {renovando ? 'A iniciar...' : 'Renovar e Pagar'}
+                                                    </Button>
                                                 </div>
                                             )}
                                             {activeSub.trainer_nome && (
