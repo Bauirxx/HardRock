@@ -45,6 +45,9 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
+member-service:
+  url: ${MEMBER_SERVICE_URL:http://localhost:8082}
+
 management:
   endpoints:
     web:

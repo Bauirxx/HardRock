@@ -30,12 +30,14 @@ public class PlanoService {
     private final PlanoRepository planoRepository;
     private final ServicoRepository servicoRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final com.gym.gym.client.MemberClient memberClient;
 
     public PlanoService(PlanoRepository planoRepository, ServicoRepository servicoRepository,
-                        RabbitTemplate rabbitTemplate) {
+                        RabbitTemplate rabbitTemplate, com.gym.gym.client.MemberClient memberClient) {
         this.planoRepository = planoRepository;
         this.servicoRepository = servicoRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.memberClient = memberClient;
     }
 
     public Page<PlanoDTO> listarTodos(Pageable pageable) {
@@ -183,16 +185,27 @@ public class PlanoService {
 
     private void publicarEvento(String eventType, PlanoEntity plano) {
         try {
-            Map<String, Object> event = Map.of(
-                "eventType", eventType,
-                "planoId", plano.getId().toString(),
-                "clienteId", plano.getClienteId().toString(),
-                "servicoId", plano.getServicoId().toString(),
-                "estado", plano.getEstado().name(),
-                "dataFim", plano.getDataFim().toString(),
-                "timestamp", LocalDateTime.now().toString(),
-                "correlationId", UUID.randomUUID().toString()
-            );
+            Map<String, Object> event = new HashMap<>();
+            event.put("eventType", eventType);
+            event.put("planoId", plano.getId().toString());
+            event.put("clienteId", plano.getClienteId().toString());
+            event.put("servicoId", plano.getServicoId().toString());
+            event.put("estado", plano.getEstado().name());
+            if (plano.getDataFim() != null) event.put("dataFim", plano.getDataFim().toString());
+            if (plano.getDataInicio() != null) event.put("dataInicio", plano.getDataInicio().toString());
+            if (plano.getPrecoPago() != null) event.put("precoPago", plano.getPrecoPago().toString());
+            event.put("timestamp", LocalDateTime.now().toString());
+            event.put("correlationId", UUID.randomUUID().toString());
+
+            // Enriquecer com nome do serviço e dados do cliente (para o email)
+            servicoRepository.findById(plano.getServicoId())
+                    .ifPresent(s -> event.put("servicoNome", s.getNome()));
+            var cliente = memberClient.buscar(plano.getClienteId());
+            if (cliente != null) {
+                if (cliente.nome() != null && !cliente.nome().isBlank()) event.put("clienteNome", cliente.nome());
+                if (cliente.email() != null && !cliente.email().isBlank()) event.put("clienteEmail", cliente.email());
+            }
+
             rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_PLANO,
                     "plano." + eventType.toLowerCase(), event);
         } catch (Exception e) {
