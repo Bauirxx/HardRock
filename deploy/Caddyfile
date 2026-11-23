@@ -33,7 +33,7 @@
 
 		# CSP — ajustar quando adicionares CDNs. Em modo relatório primeiro se receares quebrar o frontend.
 		# 'unsafe-inline' em style-src e script-src são necessários para Vite/React dev — em build de produção podes reforçar.
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://paysuite.tech; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://paysuite.tech; frame-src https://www.openstreetmap.org https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
 		# Esconde que o servidor é Caddy
 		-Server
