@@ -344,11 +344,14 @@ export default function AdminSubscriptions() {
                                             onChange={e => setForm(prev => recalcular(prev, { desconto: e.target.value }))} />
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between rounded-lg bg-primary/10 border border-primary/20 px-4 py-3">
-                                    <span className="text-sm font-medium">Total a pagar</span>
-                                    <span className="text-xl font-space font-bold text-primary">
-                                        {Number(form.valor_pago || 0).toLocaleString('pt-MZ')} MZN
-                                    </span>
+                                <div className="rounded-lg bg-primary/10 border border-primary/20 px-4 py-3">
+                                    <Label className="text-sm font-medium">Total a pagar (MZN)</Label>
+                                    <Input type="number" min="0" value={form.valor_pago}
+                                        onChange={e => setForm({ ...form, valor_pago: e.target.value })}
+                                        className="mt-2 text-lg font-bold bg-background" />
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Calculado automaticamente (preço − desconto). Podes ajustar manualmente, mesmo numa subscrição já paga.
+                                    </p>
                                 </div>
                                 <div>
                                     <Label>Método de Pagamento</Label>

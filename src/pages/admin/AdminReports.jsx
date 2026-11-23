@@ -1,10 +1,31 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dumbbell, ShoppingCart, Users, TrendingUp, CreditCard, Package } from 'lucide-react';
+import { Dumbbell, ShoppingCart, Users, TrendingUp, CreditCard, Package, Download } from 'lucide-react';
 
 const fmtMT = (n) => new Intl.NumberFormat('pt-PT', { maximumFractionDigits: 2 }).format(n || 0) + ' MT';
+
+// Gera e descarrega um CSV (abre no Excel). Escapa aspas e vírgulas.
+function exportarCSV(nomeFicheiro, colunas, linhas) {
+    const escapar = (v) => {
+        const s = v == null ? '' : String(v);
+        return /[",;\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const header = colunas.map(c => escapar(c.label)).join(';');
+    const corpo = linhas.map(l => colunas.map(c => escapar(c.get(l))).join(';')).join('\n');
+    const csv = '﻿' + header + '\n' + corpo; // BOM para acentos no Excel
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${nomeFicheiro}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
 function Kpi({ icon: Icon, label, value, sub, color = 'text-primary' }) {
     return (
@@ -91,7 +112,20 @@ export default function AdminReports() {
 
             {/* Ginásio */}
             <section className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Ginásio — Subscrições</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Ginásio — Subscrições</h2>
+                    <Button variant="outline" size="sm" className="gap-2" disabled={subsPagas.length === 0}
+                        onClick={() => exportarCSV('subscricoes', [
+                            { label: 'Cliente', get: s => nomeCliente(s.client_id) },
+                            { label: 'Serviço', get: s => s.service_nome || '' },
+                            { label: 'Valor (MT)', get: s => s.valor_pago || 0 },
+                            { label: 'Estado', get: s => s.status },
+                            { label: 'Início', get: s => s.data_inicio || '' },
+                            { label: 'Validade', get: s => s.data_fim || '' },
+                        ], subsPagas)}>
+                        <Download className="w-4 h-4" /> Exportar CSV
+                    </Button>
+                </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <Kpi icon={CreditCard} label="Subscrições activas" value={subsActivas.length} color="text-green-500" />
                     <Kpi icon={CreditCard} label="Total subscrições" value={subs.length} />
@@ -135,7 +169,19 @@ export default function AdminReports() {
 
             {/* Loja */}
             <section className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Loja — Vendas</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Loja — Vendas</h2>
+                    <Button variant="outline" size="sm" className="gap-2" disabled={vendasPagas.length === 0}
+                        onClick={() => exportarCSV('vendas', [
+                            { label: 'Cliente', get: o => o.cliente_nome || nomeCliente(o.client_id) },
+                            { label: 'Nº Itens', get: o => Array.isArray(o.items) ? o.items.length : 0 },
+                            { label: 'Total (MT)', get: o => o.valor_total || 0 },
+                            { label: 'Estado', get: o => o.status },
+                            { label: 'Data', get: o => o.created_date ? new Date(o.created_date).toLocaleDateString('pt-PT') : '' },
+                        ], vendasPagas)}>
+                        <Download className="w-4 h-4" /> Exportar CSV
+                    </Button>
+                </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <Kpi icon={ShoppingCart} label="Vendas pagas" value={vendasPagas.length} color="text-green-500" />
                     <Kpi icon={Package} label="Itens vendidos" value={itensVendidos} />
