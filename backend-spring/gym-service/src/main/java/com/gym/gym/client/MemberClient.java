@@ -3,9 +3,11 @@ package com.gym.gym.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,7 +23,10 @@ public class MemberClient {
     private final RestClient restClient;
 
     public MemberClient(@Value("${member-service.url:http://localhost:8082}") String baseUrl) {
-        this.restClient = RestClient.builder().baseUrl(baseUrl).build();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(2));
+        factory.setReadTimeout(Duration.ofSeconds(3));
+        this.restClient = RestClient.builder().baseUrl(baseUrl).requestFactory(factory).build();
     }
 
     public record Cliente(String nome, String email) {}
