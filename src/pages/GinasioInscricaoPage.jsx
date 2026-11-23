@@ -50,7 +50,7 @@ export default function GinasioInscricaoPage() {
                     <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
                     <h1 className="text-2xl font-space font-bold mb-2">Pedido enviado!</h1>
                     <p className="text-muted-foreground mb-6">
-                        Recebemos a tua solicitação de inscrição. A nossa equipa vai analisá-la e entrar em contacto contigo em breve.
+                        Recebemos o teu pedido. A nossa equipa vai entrar em contacto para marcar a tua visita e concluir a inscrição presencialmente.
                     </p>
                     <div className="flex gap-3 justify-center">
                         <Button variant="outline" onClick={() => navigate('/ginasio')}>Voltar ao ginásio</Button>
@@ -76,14 +76,15 @@ export default function GinasioInscricaoPage() {
                     <h1 className="text-3xl font-space font-bold text-foreground tracking-tighter uppercase italic">
                         <span className="text-primary">Hard Rock</span> Gym
                     </h1>
-                    <p className="text-muted-foreground text-sm mt-2">Quero inscrever-me</p>
+                    <p className="text-muted-foreground text-sm mt-2">Agendar visita / Pedido de inscrição</p>
                 </div>
 
                 <Card className="bg-card/70 border-border backdrop-blur-xl shadow-2xl">
                     <CardHeader>
-                        <CardTitle className="font-space text-xl">Pré-inscrição no Ginásio</CardTitle>
+                        <CardTitle className="font-space text-xl">Quero frequentar o ginásio</CardTitle>
                         <CardDescription>
-                            Preenche os teus dados. A inscrição é confirmada pela nossa equipa — isto não cria acesso imediato.
+                            Deixa os teus dados e a nossa equipa entra em contacto para marcar a tua visita.
+                            A inscrição é finalizada <strong>presencialmente no ginásio</strong>; depois recebes por email as tuas credenciais de acesso.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

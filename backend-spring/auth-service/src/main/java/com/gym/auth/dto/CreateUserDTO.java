@@ -25,5 +25,9 @@ public record CreateUserDTO(
     String bio,
     String disponibilidade,
     String telefone,
-    @JsonAlias({"foto_url"}) String fotoUrl
+    @JsonAlias({"foto_url"}) String fotoUrl,
+
+    // Quando true, envia ao utilizador um email com as credenciais de acesso
+    @JsonAlias({"enviar_credenciais"})
+    Boolean enviarCredenciais
 ) {}

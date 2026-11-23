@@ -40,6 +40,11 @@ public class EmailEventPublisher {
         publish(Map.of("eventType", "CONVITE", "nome", nome, "email", email, "role", role, "inviteToken", inviteToken));
     }
 
+    // Credenciais de acesso enviadas quando a inscrição é feita presencialmente pelo staff
+    public void credenciaisAcesso(String nome, String email, String senha) {
+        publish(Map.of("eventType", "CREDENCIAIS_ACESSO", "nome", nome, "email", email, "senha", senha));
+    }
+
     private void publish(Map<String, String> event) {
         try {
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING, event);

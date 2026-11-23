@@ -301,6 +301,20 @@ class EntityAPI {
     }
 }
 
+// Gera uma password temporária razoavelmente forte (>= 8 chars) para contas
+// criadas presencialmente. O membro recebe-a por email e deve trocá-la.
+function gerarPasswordTemporaria() {
+    const maiusc = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const minusc = 'abcdefghijkmnpqrstuvwxyz';
+    const nums = '23456789';
+    const simb = '@$!%*?&#';
+    const pick = (s) => s[Math.floor(Math.random() * s.length)];
+    let p = pick(maiusc) + pick(minusc) + pick(nums) + pick(simb);
+    const todos = maiusc + minusc + nums;
+    for (let i = 0; i < 6; i++) p += pick(todos);
+    return p;
+}
+
 // ─── Exported API ───────────────────────────────────────────────
 
 export const base44 = {
@@ -390,13 +404,45 @@ export const base44 = {
     },
     integrations: {
         Core: {
-            // Converte o ficheiro para data URL (base64) — evita infra de storage.
-            // A imagem fica embutida no próprio campo (foto/imagem_url).
-            UploadFile: async ({ file }) => {
+            // Converte o ficheiro para data URL (base64) REDIMENSIONADO/COMPRIMIDO.
+            // Fotos de telemóvel têm vários MB; em base64 isso excede os limites de
+            // buffer do gateway (e incha a BD). Reduzimos para no máximo 1200px e
+            // JPEG q=0.82 → tipicamente 80-200KB, persiste bem e carrega rápido.
+            UploadFile: async ({ file, maxDim = 1200, quality = 0.82 }) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.onload = () => resolve({ file_url: reader.result });
                     reader.onerror = () => reject(new Error('Falha ao ler o ficheiro'));
+                    reader.onload = () => {
+                        const original = reader.result;
+                        // SVG ou tipos sem raster → devolve como está
+                        if (typeof original !== 'string' || !file.type.startsWith('image/') || file.type === 'image/svg+xml') {
+                            resolve({ file_url: original });
+                            return;
+                        }
+                        const img = new Image();
+                        img.onerror = () => resolve({ file_url: original });
+                        img.onload = () => {
+                            try {
+                                let { width, height } = img;
+                                if (width > maxDim || height > maxDim) {
+                                    const scale = Math.min(maxDim / width, maxDim / height);
+                                    width = Math.round(width * scale);
+                                    height = Math.round(height * scale);
+                                }
+                                const canvas = document.createElement('canvas');
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+                                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                                // se por algum motivo ficou maior, mantém o menor
+                                resolve({ file_url: dataUrl.length < original.length ? dataUrl : original });
+                            } catch {
+                                resolve({ file_url: original });
+                            }
+                        };
+                        img.src = original;
+                    };
                     reader.readAsDataURL(file);
                 });
             },
@@ -415,6 +461,29 @@ export const base44 = {
             const result = await request(`${API_URL}/clientes`, {
                 method: 'POST', body: JSON.stringify(payload),
             });
+
+            // Inscrição presencial: se houver email, cria a conta de acesso e envia
+            // as credenciais por email. Não falha a inscrição se o email já existir.
+            if (data.email) {
+                try {
+                    const tempPassword = gerarPasswordTemporaria();
+                    await request(`${API_URL}/auth/users`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            nome: payload.nome,
+                            email: data.email,
+                            password: tempPassword,
+                            perfil: 'USUARIO_NORMAL',
+                            role: 'internal_client',
+                            telefone: payload.numero_telefone,
+                            enviar_credenciais: true,
+                        }),
+                    });
+                } catch (e) {
+                    // conta já existe ou falha de email — a ficha do cliente fica criada na mesma
+                    console.warn('Conta de acesso não criada:', e.message);
+                }
+            }
             return mapClient(result);
         },
         resetPassword: async (userId, newPassword) => {

@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: api-gateway
+  # Aumenta o buffer de corpo (default 256KB) para aceitar payloads com imagens base64
+  codec:
+    max-in-memory-size: 10MB
   cloud:
     gateway:
       server:

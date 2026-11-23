@@ -20,10 +20,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailEventPublisher emailEvents;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       EmailEventPublisher emailEvents) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailEvents = emailEvents;
     }
 
     public Page<UserResponseDTO> listarTodos(Pageable pageable) {
@@ -74,7 +77,19 @@ public class UserService {
         user.setTelefone(dto.telefone());
         user.setFotoUrl(dto.fotoUrl());
 
-        return UserResponseDTO.from(userRepository.save(user));
+        UserEntity guardado = userRepository.save(user);
+
+        // Inscrição presencial: envia email com as credenciais (password em claro só aqui,
+        // antes de ser hashada — é a password temporária definida pelo staff).
+        if (Boolean.TRUE.equals(dto.enviarCredenciais()) && dto.email() != null) {
+            try {
+                emailEvents.credenciaisAcesso(guardado.getNome(), guardado.getEmail(), dto.password());
+            } catch (Exception e) {
+                // não falhar a criação por causa do email
+            }
+        }
+
+        return UserResponseDTO.from(guardado);
     }
 
     @Transactional

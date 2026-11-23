@@ -137,6 +137,14 @@ public class PlanoEventConsumer {
                     emailService.enviar(email, "Convite — Hard Rock Gym", templates.convite(nome, email, role, token));
                 }
             }
+            case "CREDENCIAIS_ACESSO" -> {
+                String email = str(event, "email");
+                String nome = str(event, "nome");
+                String senha = str(event, "senha");
+                if (email != null) {
+                    emailService.enviar(email, "As tuas credenciais — Hard Rock Gym", templates.credenciaisAcesso(nome, email, senha));
+                }
+            }
             default -> log.debug("[NOTIF] Evento ignorado: {}", eventType);
         }
     }

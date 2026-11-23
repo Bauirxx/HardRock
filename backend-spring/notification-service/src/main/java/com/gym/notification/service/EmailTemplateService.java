@@ -85,6 +85,28 @@ public class EmailTemplateService {
         return wrap("Bem-vindo!", body);
     }
 
+    // ─── 1b. CREDENCIAIS DE ACESSO (inscrição presencial) ───────
+
+    public String credenciaisAcesso(String nome, String email, String senha) {
+        String body = p("Olá " + strong(nome) + ",")
+            + p("A tua inscrição no " + strong(appName) + " foi registada com sucesso pela nossa equipa!")
+            + p("Estas são as tuas credenciais de acesso à plataforma:")
+            + """
+            <table width="100%%" cellpadding="0" cellspacing="0" style="background:#222;border-radius:10px;padding:20px;margin:20px 0;">
+            <tr><td>
+                <p style="color:#999;font-size:12px;margin:0 0 4px;text-transform:uppercase;">As tuas credenciais</p>
+                <p style="color:#fff;font-size:14px;margin:0 0 8px;">Email: <strong>%s</strong></p>
+                <p style="color:#fff;font-size:14px;margin:0 0 8px;">Password temporária: <strong>%s</strong></p>
+                <p style="color:#dc2626;font-size:12px;margin:0;">Por segurança, muda a password após o primeiro acesso.</p>
+            </td></tr>
+            </table>
+            """.formatted(email, senha)
+            + button("Aceder à Minha Conta", frontendUrl + "/login")
+            + p("Bem-vindo à família Hard Rock Gym!");
+
+        return wrap("As tuas credenciais de acesso", body);
+    }
+
     // ─── 2. VERIFICAÇÃO DE EMAIL ────────────────────────────────
 
     public String verificacaoEmail(String nome, String codigo) {

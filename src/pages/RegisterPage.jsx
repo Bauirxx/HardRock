@@ -224,6 +224,9 @@ export default function RegisterPage() {
                         <p className="text-center text-sm text-muted-foreground mt-6">
                             Já tem conta? <Link to="/login" className="text-primary font-medium hover:underline">Iniciar sessão</Link>
                         </p>
+                        <p className="text-center text-xs text-muted-foreground mt-2">
+                            Queres frequentar o ginásio? <Link to="/ginasio/inscricao" className="text-primary hover:underline">Pedir inscrição</Link>
+                        </p>
                     </CardContent>
                 </Card>
 

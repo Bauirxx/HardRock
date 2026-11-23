@@ -83,25 +83,25 @@ export default function TransformationsSection() {
                     <div className="relative">
                         {/* Before/After slider */}
                         <div
-                            className="relative aspect-[3/2] sm:aspect-[2/1] rounded-2xl overflow-hidden cursor-col-resize select-none"
+                            className="relative aspect-[3/2] sm:aspect-[2/1] rounded-2xl overflow-hidden cursor-col-resize select-none bg-black"
                             onMouseMove={handleSliderMove}
                             onTouchMove={handleSliderMove}
                         >
-                            {/* After (full background) */}
+                            {/* After (full background) — object-contain para não cortar a foto */}
                             <img
                                 src={t.depois}
                                 alt={`${t.nome} — Depois`}
                                 loading="lazy"
-                                className="absolute inset-0 w-full h-full object-cover"
+                                className="absolute inset-0 w-full h-full object-contain"
                             />
 
                             {/* Before (clipped) */}
-                            <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPos}%` }}>
+                            <div className="absolute inset-0 overflow-hidden bg-black" style={{ width: `${sliderPos}%` }}>
                                 <img
                                     src={t.antes}
                                     alt={`${t.nome} — Antes`}
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover grayscale"
+                                    className="absolute inset-0 h-full object-contain grayscale"
                                     style={{ width: `${(100 / sliderPos) * 100}%`, maxWidth: 'none' }}
                                 />
                             </div>
