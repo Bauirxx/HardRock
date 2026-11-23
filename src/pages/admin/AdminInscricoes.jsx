@@ -18,20 +18,18 @@ const STATUS_BADGE = {
 export default function AdminInscricoes() {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filtro, setFiltro] = useState('');
+    const [filtro, setFiltro] = useState('pendente');
     const [busca, setBusca] = useState('');
     const [ordenar, setOrdenar] = useState('recentes');
     const [deleteTarget, setDeleteTarget] = useState(null);
     const { toast } = useToast();
 
-    useEffect(() => { loadData(); }, [filtro]);
+    useEffect(() => { loadData(); }, []);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const data = filtro
-                ? await base44.entities.GymApplication.filter({ status: filtro, size: 100 })
-                : await base44.entities.GymApplication.list('-created_date', 100);
+            const data = await base44.entities.GymApplication.list('-created_date', 200);
             setItems(Array.isArray(data) ? data : []);
         } catch (e) {
             toast({ variant: 'destructive', title: 'Erro', description: e.message });
@@ -86,6 +84,7 @@ export default function AdminInscricoes() {
     const pendentes = items.filter(i => i.status === 'pendente').length;
 
     const visiveis = items
+        .filter(s => !filtro || s.status === filtro)
         .filter(s => {
             const q = busca.trim().toLowerCase();
             if (!q) return true;
@@ -184,7 +183,13 @@ export default function AdminInscricoes() {
                 ))}
                 {visiveis.length === 0 && !loading && (
                     <div className="text-center py-12 text-muted-foreground">
-                        {items.length === 0 ? 'Nenhum pedido de inscrição.' : 'Nenhum pedido corresponde à pesquisa.'}
+                        {items.length === 0
+                            ? 'Nenhum pedido de inscrição.'
+                            : busca.trim()
+                                ? 'Nenhum pedido corresponde à pesquisa.'
+                                : filtro === 'pendente'
+                                    ? 'Nenhum pedido pendente. Os aprovados já são membros em Clientes.'
+                                    : 'Nenhum pedido neste estado.'}
                     </div>
                 )}
             </div>
