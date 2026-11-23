@@ -35,7 +35,7 @@ spring:
             - id: member-service
               uri: http://localhost:8082
               predicates:
-                - Path=/api/v1/clientes/**,/api/v1/personal-trainers/**,/api/v1/leads/**,/api/v1/sessoes/**,/api/v1/notificacoes/**
+                - Path=/api/v1/clientes/**,/api/v1/personal-trainers/**,/api/v1/leads/**,/api/v1/inscricoes/**,/api/v1/sessoes/**,/api/v1/notificacoes/**
               filters:
                 - StripPrefix=0
 

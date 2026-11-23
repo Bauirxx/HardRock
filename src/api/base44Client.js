@@ -246,6 +246,7 @@ const entityConfig = {
     Payment:  { path: '/pagamentos',      mapper: mapPayment },
     Testimonial: { path: '/testemunhos',  mapper: x => x },
     Transformation: { path: '/transformacoes', mapper: x => x },
+    GymApplication: { path: '/inscricoes',  mapper: x => x },
     Lead:     { path: '/leads',           mapper: x => x },
 };
 
@@ -314,6 +315,7 @@ export const base44 = {
         Payment: new EntityAPI('Payment'),
         Testimonial: new EntityAPI('Testimonial'),
         Transformation: new EntityAPI('Transformation'),
+        GymApplication: new EntityAPI('GymApplication'),
         Lead: new EntityAPI('Lead'),
     },
     auth: {

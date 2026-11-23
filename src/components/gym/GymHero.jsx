@@ -75,13 +75,13 @@ export default function GymHero() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <a href="#lead-form">
+                        <Link to="/ginasio/inscricao">
                             <Button size="lg" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl shadow-lg shadow-primary/30">
                                 <CalendarCheck className="w-5 h-5" />
-                                Aula experimental grátis
+                                Quero inscrever-me
                                 <ChevronRight className="w-4 h-4" />
                             </Button>
-                        </a>
+                        </Link>
                         <a href="#planos">
                             <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl border-white/25 text-white hover:bg-white/10 bg-transparent">
                                 <Dumbbell className="w-5 h-5" />

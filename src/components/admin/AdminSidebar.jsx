@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Package, ShoppingCart, CreditCard,
     UserPlus, Settings, Dumbbell, ChevronLeft, MessageSquare,
-    CalendarCheck, BadgeCheck, PanelLeftClose, PanelLeftOpen, Sparkles
+    CalendarCheck, BadgeCheck, PanelLeftClose, PanelLeftOpen, Sparkles, ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ const menuItems = [
     { to: '/admin/encomendas', icon: ShoppingCart, label: 'Encomendas' },
     { to: '/admin/pagamentos', icon: CreditCard, label: 'Pagamentos' },
     { to: '/admin/leads', icon: UserPlus, label: 'Leads' },
+    { to: '/admin/inscricoes', icon: ClipboardList, label: 'Pedidos Inscrição' },
     { to: '/admin/depoimentos', icon: MessageSquare, label: 'Depoimentos' },
     { to: '/admin/transformacoes', icon: Sparkles, label: 'Histórias de Sucesso' },
     { to: '/admin/configuracoes', icon: Settings, label: 'Configurações' },

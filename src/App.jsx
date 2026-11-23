@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 
 // Lazy-loaded: everything else (code-split)
 const HardRockPage = lazy(() => import('./pages/HardRockPage'));
+const GinasioInscricaoPage = lazy(() => import('./pages/GinasioInscricaoPage'));
 const StorePage = lazy(() => import('./pages/StorePage'));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
 const CartPage = lazy(() => import('./pages/CartPage'));
@@ -37,6 +38,7 @@ const AdminLeads = lazy(() => import('./pages/admin/AdminLeads'));
 const AdminServices = lazy(() => import('./pages/admin/AdminServices'));
 const AdminTestimonials = lazy(() => import('./pages/admin/AdminTestimonials'));
 const AdminTransformations = lazy(() => import('./pages/admin/AdminTransformations'));
+const AdminInscricoes = lazy(() => import('./pages/admin/AdminInscricoes'));
 const AdminTrainers = lazy(() => import('./pages/admin/AdminTrainers'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminSubscriptions = lazy(() => import('./pages/admin/AdminSubscriptions'));
@@ -111,6 +113,7 @@ const AuthenticatedApp = () => {
         {/* Public pages */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/ginasio" element={<HardRockPage />} />
+        <Route path="/ginasio/inscricao" element={<GinasioInscricaoPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registo" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -148,6 +151,7 @@ const AuthenticatedApp = () => {
           <Route path="servicos" element={<AdminServices />} />
           <Route path="depoimentos" element={<AdminTestimonials />} />
           <Route path="transformacoes" element={<AdminTransformations />} />
+          <Route path="inscricoes" element={<AdminInscricoes />} />
           <Route path="trainers" element={<AdminTrainers />} />
           <Route path="subscricoes" element={<AdminSubscriptions />} />
           <Route path="configuracoes" element={<AdminSettings />} />

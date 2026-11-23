@@ -79,6 +79,8 @@ public class SecurityConfig {
                 ).permitAll()
                 // Submissão pública do formulário de contacto da landing
                 .requestMatchers(HttpMethod.POST, "/api/v1/leads").permitAll()
+                // Submissão pública de pré-inscrição no ginásio
+                .requestMatchers(HttpMethod.POST, "/api/v1/inscricoes").permitAll()
                 // Webhook do gateway de pagamentos (chamado pelo PaySuite, sem JWT)
                 .requestMatchers(HttpMethod.POST, "/api/v1/checkout/webhook").permitAll()
                 // Endpoints internos service-to-service (não roteados pelo gateway → inacessíveis pelo browser)
