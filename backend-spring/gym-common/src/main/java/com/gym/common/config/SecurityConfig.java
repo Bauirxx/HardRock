@@ -74,6 +74,7 @@ public class SecurityConfig {
                     "/api/v1/produtos/**",
                     "/api/v1/personal-trainers/**",
                     "/api/v1/testemunhos/**",
+                    "/api/v1/transformacoes/**",
                     "/api/v1/configuracoes/**"
                 ).permitAll()
                 // Submissão pública do formulário de contacto da landing

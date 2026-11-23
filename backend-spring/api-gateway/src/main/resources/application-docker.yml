@@ -22,7 +22,7 @@ spring:
             - id: gym-service
               uri: http://gym-gym-service:8083
               predicates:
-                - Path=/api/v1/servicos/**,/api/v1/planos/**,/api/v1/testemunhos/**,/api/v1/pagamentos/**,/api/v1/configuracoes/**
+                - Path=/api/v1/servicos/**,/api/v1/planos/**,/api/v1/testemunhos/**,/api/v1/transformacoes/**,/api/v1/pagamentos/**,/api/v1/configuracoes/**
               filters:
                 - StripPrefix=0
             - id: store-service

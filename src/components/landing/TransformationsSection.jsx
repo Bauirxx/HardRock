@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import { base44 } from '@/api/base44Client';
 
-const transformations = [
+// Fallback usado só se a API não devolver nada (ex: BD vazia ou offline)
+const FALLBACK = [
     {
         nome: 'Ricardo M.',
         antes: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=500&fit=crop',
@@ -27,18 +29,35 @@ const transformations = [
 ];
 
 export default function TransformationsSection() {
+    const [transformations, setTransformations] = useState(FALLBACK);
     const [current, setCurrent] = useState(0);
     const [sliderPos, setSliderPos] = useState(50);
 
-    const next = useCallback(() => setCurrent(c => (c + 1) % transformations.length), []);
-    const prev = useCallback(() => setCurrent(c => (c - 1 + transformations.length) % transformations.length), []);
+    useEffect(() => {
+        let mounted = true;
+        base44.entities.Transformation.list('ordem', 50)
+            .then(data => {
+                if (mounted && Array.isArray(data) && data.length > 0) {
+                    setTransformations(data);
+                    setCurrent(0);
+                }
+            })
+            .catch(() => { /* mantém o FALLBACK */ });
+        return () => { mounted = false; };
+    }, []);
+
+    const total = transformations.length;
+    const next = useCallback(() => setCurrent(c => (c + 1) % total), [total]);
+    const prev = useCallback(() => setCurrent(c => (c - 1 + total) % total), [total]);
 
     useEffect(() => {
+        if (total <= 1) return;
         const timer = setInterval(next, 6000);
         return () => clearInterval(timer);
-    }, [next]);
+    }, [next, total]);
 
-    const t = transformations[current];
+    const t = transformations[current] || transformations[0];
+    if (!t) return null;
 
     const handleSliderMove = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();

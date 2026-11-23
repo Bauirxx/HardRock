@@ -245,6 +245,7 @@ const entityConfig = {
     Order:    { path: '/vendas',          mapper: mapOrder },
     Payment:  { path: '/pagamentos',      mapper: mapPayment },
     Testimonial: { path: '/testemunhos',  mapper: x => x },
+    Transformation: { path: '/transformacoes', mapper: x => x },
     Lead:     { path: '/leads',           mapper: x => x },
 };
 
@@ -312,6 +313,7 @@ export const base44 = {
         Order: new EntityAPI('Order'),
         Payment: new EntityAPI('Payment'),
         Testimonial: new EntityAPI('Testimonial'),
+        Transformation: new EntityAPI('Transformation'),
         Lead: new EntityAPI('Lead'),
     },
     auth: {
