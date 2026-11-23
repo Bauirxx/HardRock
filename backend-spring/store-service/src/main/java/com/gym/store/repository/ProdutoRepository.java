@@ -13,4 +13,7 @@ public interface ProdutoRepository extends JpaRepository<ProdutoEntity, UUID> {
     Page<ProdutoEntity> findByActivoTrueAndStockGreaterThan(int minStock, Pageable pageable);
     Page<ProdutoEntity> findByActivoTrue(Pageable pageable);
     Page<ProdutoEntity> findByCategoriaAndActivoTrueAndStockGreaterThan(CategoriaProduto cat, int min, Pageable p);
+
+    // Unicidade do nome entre produtos activos (evita duplicados)
+    boolean existsByNomeIgnoreCaseAndActivoTrue(String nome);
 }

@@ -1,12 +1,14 @@
 package com.gym.store.service;
 
 import com.gym.common.enums.CategoriaProduto;
+import com.gym.common.exception.BusinessException;
 import com.gym.common.exception.ResourceNotFoundException;
 import com.gym.store.dto.*;
 import com.gym.store.model.ProdutoEntity;
 import com.gym.store.repository.ProdutoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
@@ -39,6 +41,9 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoDTO criar(CreateProdutoDTO dto) {
+        if (dto.nome() != null && produtoRepository.existsByNomeIgnoreCaseAndActivoTrue(dto.nome().trim())) {
+            throw new BusinessException("Já existe um produto com o nome \"" + dto.nome().trim() + "\"", HttpStatus.CONFLICT);
+        }
         ProdutoEntity p = new ProdutoEntity();
         aplicar(p, dto);
         return ProdutoDTO.from(produtoRepository.save(p));

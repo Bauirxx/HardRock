@@ -5,12 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dumbbell, Lock, Mail, ArrowRight, User, Calendar } from 'lucide-react';
+import { Dumbbell, Lock, Mail, ArrowRight, User, Calendar, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 
+// Regras da password — têm de bater certo com o backend (RegisterRequestDTO)
+const PASSWORD_RULES = [
+    { id: 'len', label: 'Mínimo 8 caracteres', test: (p) => p.length >= 8 },
+    { id: 'upper', label: 'Uma letra maiúscula (A-Z)', test: (p) => /[A-Z]/.test(p) },
+    { id: 'lower', label: 'Uma letra minúscula (a-z)', test: (p) => /[a-z]/.test(p) },
+    { id: 'digit', label: 'Um número (0-9)', test: (p) => /\d/.test(p) },
+    { id: 'special', label: 'Um símbolo (@ $ ! % * ? & #)', test: (p) => /[@$!%*?&#]/.test(p) },
+];
+
+function passwordValida(p) {
+    return PASSWORD_RULES.every(r => r.test(p));
+}
+
 export default function RegisterPage() {
-    const [step, setStep] = useState('register');
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
@@ -18,19 +30,20 @@ export default function RegisterPage() {
         genero: '',
         idade: ''
     });
-    const [verificationCode, setVerificationCode] = useState('');
     const [loading, setLoading] = useState(false);
+    const [passwordFocus, setPasswordFocus] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        if (loading) return; // evita duplo-submit
         if (!formData.full_name || !formData.email || !formData.password || !formData.genero || !formData.idade) {
             toast({ variant: "destructive", title: "Erro", description: "Todos os campos são obrigatórios" });
             return;
         }
-        if (formData.password.length < 6) {
-            toast({ variant: "destructive", title: "Erro", description: "Senha deve ter pelo menos 6 caracteres" });
+        if (!passwordValida(formData.password)) {
+            toast({ variant: "destructive", title: "Password fraca", description: "A password não cumpre todos os requisitos indicados." });
             return;
         }
         if (formData.idade < 14 || formData.idade > 120) {
@@ -48,56 +61,22 @@ export default function RegisterPage() {
                 idade: parseInt(formData.idade)
             });
 
-            if (result.pending) {
-                setStep('verify');
-                toast({ title: "Sucesso", description: "Código de verificação enviado para seu email" });
-                if (result.dev_code) {
-                    console.log('DEV: Verification code =', result.dev_code);
-                }
+            // O backend cria a conta e devolve logo os tokens (já fica autenticado)
+            if (result && (result.token || result.user)) {
+                toast({ title: "Bem-vindo!", description: "Conta criada com sucesso." });
+                setTimeout(() => navigate('/'), 800);
             } else {
-                toast({ variant: "destructive", title: "Erro", description: "Falha ao registar" });
+                toast({ variant: "destructive", title: "Erro", description: "Falha ao registar. Tenta novamente." });
             }
         } catch (error) {
-            toast({ variant: "destructive", title: "Erro", description: error.message });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerify = async (e) => {
-        e.preventDefault();
-        if (!verificationCode) {
-            toast({ variant: "destructive", title: "Erro", description: "Código de verificação obrigatório" });
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const result = await base44.auth.verifyEmail({
-                email: formData.email,
-                code: verificationCode
-            });
-
-            if (result.verified) {
-                toast({ title: "Bem-vindo!", description: "Conta ativada com sucesso" });
-                setTimeout(() => navigate('/login'), 1500);
+            // Email já existe → a conta provavelmente já foi criada antes; encaminha para login
+            const msg = error.message || 'Erro no registo';
+            if (/já está registado|já existe|conflito|409/i.test(msg)) {
+                toast({ title: "Conta já existe", description: "Este email já tem conta. Vai iniciar sessão." });
+                setTimeout(() => navigate('/login'), 1200);
             } else {
-                toast({ variant: "destructive", title: "Erro", description: "Falha na verificação" });
+                toast({ variant: "destructive", title: "Erro", description: msg });
             }
-        } catch (error) {
-            toast({ variant: "destructive", title: "Erro", description: error.message });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleResendCode = async () => {
-        setLoading(true);
-        try {
-            await base44.auth.resendVerification({ email: formData.email });
-            toast({ title: "Enviado", description: "Novo código enviado para seu email" });
-        } catch (error) {
-            toast({ variant: "destructive", title: "Erro", description: error.message });
         } finally {
             setLoading(false);
         }
@@ -124,24 +103,21 @@ export default function RegisterPage() {
                         <span className="text-primary">Hard Rock</span> Gym
                     </h1>
                     <p className="text-muted-foreground text-sm mt-2">
-                        {step === 'register' ? 'Crie sua conta' : 'Verifique seu email'}
+                        Crie sua conta
                     </p>
                 </div>
 
                 <Card className="bg-card/70 border-border backdrop-blur-xl shadow-2xl">
                     <CardHeader>
                         <CardTitle className="font-space text-xl">
-                            {step === 'register' ? 'Criar Conta' : 'Verificar Email'}
+                            Criar Conta
                         </CardTitle>
                         <CardDescription>
-                            {step === 'register'
-                                ? 'Junte-se à comunidade Hard Rock Gym'
-                                : 'Digite o código enviado para seu email'}
+                            Junte-se à comunidade Hard Rock Gym
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {step === 'register' ? (
-                            <form onSubmit={handleRegister} className="space-y-4">
+                        <form onSubmit={handleRegister} className="space-y-4">
                                 <div className="space-y-2">
                                     <Label>Nome Completo</Label>
                                     <div className="relative">
@@ -178,13 +154,27 @@ export default function RegisterPage() {
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                         <Input
                                             type="password"
-                                            placeholder="Mínimo 6 caracteres"
+                                            placeholder="Cria uma password forte"
                                             className="pl-10 focus-visible:ring-primary"
                                             value={formData.password}
                                             onChange={e => setFormData({...formData, password: e.target.value})}
+                                            onFocus={() => setPasswordFocus(true)}
                                             required
                                         />
                                     </div>
+                                    {(passwordFocus || formData.password.length > 0) && (
+                                        <ul className="mt-2 space-y-1 rounded-lg border border-border bg-background/50 p-3">
+                                            {PASSWORD_RULES.map(rule => {
+                                                const ok = rule.test(formData.password);
+                                                return (
+                                                    <li key={rule.id} className={`flex items-center gap-2 text-xs ${ok ? 'text-green-500' : 'text-muted-foreground'}`}>
+                                                        {ok ? <Check className="w-3.5 h-3.5 shrink-0" /> : <X className="w-3.5 h-3.5 shrink-0 opacity-50" />}
+                                                        {rule.label}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -229,48 +219,7 @@ export default function RegisterPage() {
                                     {loading ? 'A registar...' : 'CRIAR CONTA'}
                                     <ArrowRight className="w-4 h-4" />
                                 </Button>
-                            </form>
-                        ) : (
-                            <form onSubmit={handleVerify} className="space-y-4">
-                                <div className="p-3 bg-secondary/50 rounded-lg border border-border">
-                                    <p className="text-sm text-muted-foreground">
-                                        Enviámos um código de verificação para<br/>
-                                        <span className="font-medium text-foreground">{formData.email}</span>
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label>Código de Verificação</Label>
-                                    <Input
-                                        type="text"
-                                        placeholder="000000"
-                                        maxLength="6"
-                                        className="text-center text-2xl font-mono tracking-widest focus-visible:ring-primary"
-                                        value={verificationCode}
-                                        onChange={e => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                        required
-                                    />
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    className="w-full h-11 gap-2 font-bold tracking-wide active:scale-95 transition-transform"
-                                    disabled={loading || verificationCode.length !== 6}
-                                >
-                                    {loading ? 'A verificar...' : 'VERIFICAR EMAIL'}
-                                    <ArrowRight className="w-4 h-4" />
-                                </Button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleResendCode}
-                                    disabled={loading}
-                                    className="w-full text-sm text-primary hover:underline disabled:opacity-50"
-                                >
-                                    Reenviar código
-                                </button>
-                            </form>
-                        )}
+                        </form>
 
                         <p className="text-center text-sm text-muted-foreground mt-6">
                             Já tem conta? <Link to="/login" className="text-primary font-medium hover:underline">Iniciar sessão</Link>
