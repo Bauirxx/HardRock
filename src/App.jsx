@@ -39,6 +39,7 @@ const AdminServices = lazy(() => import('./pages/admin/AdminServices'));
 const AdminTestimonials = lazy(() => import('./pages/admin/AdminTestimonials'));
 const AdminTransformations = lazy(() => import('./pages/admin/AdminTransformations'));
 const AdminInscricoes = lazy(() => import('./pages/admin/AdminInscricoes'));
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'));
 const AdminTrainers = lazy(() => import('./pages/admin/AdminTrainers'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const AdminSubscriptions = lazy(() => import('./pages/admin/AdminSubscriptions'));
@@ -152,6 +153,7 @@ const AuthenticatedApp = () => {
           <Route path="depoimentos" element={<AdminTestimonials />} />
           <Route path="transformacoes" element={<AdminTransformations />} />
           <Route path="inscricoes" element={<AdminInscricoes />} />
+          <Route path="relatorios" element={<AdminReports />} />
           <Route path="trainers" element={<AdminTrainers />} />
           <Route path="subscricoes" element={<AdminSubscriptions />} />
           <Route path="configuracoes" element={<AdminSettings />} />
