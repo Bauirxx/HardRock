@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Upload } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,7 +20,27 @@ export default function AdminTransformations() {
     const [form, setForm] = useState(EMPTY);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState({ antes: false, depois: false });
     const { toast } = useToast();
+
+    const handleUpload = async (field, e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            toast({ variant: 'destructive', title: 'Ficheiro inválido', description: 'Seleciona uma imagem.' });
+            return;
+        }
+        setUploading(u => ({ ...u, [field]: true }));
+        try {
+            const { file_url } = await base44.integrations.Core.UploadFile({ file });
+            setForm(prev => ({ ...prev, [field]: file_url }));
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro no upload', description: err.message });
+        } finally {
+            setUploading(u => ({ ...u, [field]: false }));
+            e.target.value = '';
+        }
+    };
 
     useEffect(() => { loadData(); }, []);
 
@@ -94,8 +114,32 @@ export default function AdminTransformations() {
                         <DialogHeader><DialogTitle>{editId ? 'Editar' : 'Nova'} Transformação</DialogTitle></DialogHeader>
                         <div className="space-y-4">
                             <div><Label>Nome</Label><Input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Ricardo M." /></div>
-                            <div><Label>Imagem "Antes" (URL)</Label><Input value={form.antes} onChange={e => setForm({ ...form, antes: e.target.value })} placeholder="https://..." /></div>
-                            <div><Label>Imagem "Depois" (URL)</Label><Input value={form.depois} onChange={e => setForm({ ...form, depois: e.target.value })} placeholder="https://..." /></div>
+                            <div>
+                                <Label>Imagem "Antes"</Label>
+                                <div className="flex gap-2">
+                                    <Input value={form.antes} onChange={e => setForm({ ...form, antes: e.target.value })} placeholder="Cola um URL ou carrega do PC →" />
+                                    <Button type="button" variant="outline" size="icon" className="shrink-0" disabled={uploading.antes} asChild>
+                                        <label className="cursor-pointer">
+                                            <Upload className="w-4 h-4" />
+                                            <input type="file" accept="image/*" className="hidden" onChange={e => handleUpload('antes', e)} />
+                                        </label>
+                                    </Button>
+                                </div>
+                                {uploading.antes && <p className="text-xs text-muted-foreground mt-1">A carregar...</p>}
+                            </div>
+                            <div>
+                                <Label>Imagem "Depois"</Label>
+                                <div className="flex gap-2">
+                                    <Input value={form.depois} onChange={e => setForm({ ...form, depois: e.target.value })} placeholder="Cola um URL ou carrega do PC →" />
+                                    <Button type="button" variant="outline" size="icon" className="shrink-0" disabled={uploading.depois} asChild>
+                                        <label className="cursor-pointer">
+                                            <Upload className="w-4 h-4" />
+                                            <input type="file" accept="image/*" className="hidden" onChange={e => handleUpload('depois', e)} />
+                                        </label>
+                                    </Button>
+                                </div>
+                                {uploading.depois && <p className="text-xs text-muted-foreground mt-1">A carregar...</p>}
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div><Label>Tempo</Label><Input value={form.tempo} onChange={e => setForm({ ...form, tempo: e.target.value })} placeholder="6 meses" /></div>
                                 <div><Label>Ordem</Label><Input type="number" value={form.ordem} onChange={e => setForm({ ...form, ordem: e.target.value })} /></div>
