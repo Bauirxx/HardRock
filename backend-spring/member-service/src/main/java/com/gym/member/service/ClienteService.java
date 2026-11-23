@@ -33,6 +33,11 @@ public class ClienteService {
         return clienteRepository.findByTipoClienteAndActivoTrue(tipo, pageable).map(ClienteDTO::from);
     }
 
+    public java.util.List<ClienteDTO> listarPorTrainer(UUID personalTrainerId) {
+        return clienteRepository.findByPersonalTrainerIdAndActivoTrue(personalTrainerId)
+                .stream().map(ClienteDTO::from).toList();
+    }
+
     public ClienteDTO buscarPorId(UUID id) {
         ClienteEntity c = clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente", id));

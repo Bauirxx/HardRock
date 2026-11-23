@@ -90,18 +90,16 @@ export default function AdminTrainers() {
             return;
         }
         try {
-            const res = await base44.admin.createInternalClient({
+            await base44.admin.createTrainer({
                 email: form.email,
-                nome: form.full_name,
+                full_name: form.full_name,
                 telefone: form.telefone,
                 foto_url: form.foto_url || null,
                 especialidade: form.especialidade,
                 bio: form.bio,
                 disponibilidade: form.disponibilidade,
-                role: 'personal_trainer',
             });
-            toast({ title: 'Trainer criado!', description: `Credenciais enviadas para ${form.email}.` });
-            if (res.dev_password) toast({ title: `Dev: senha = ${res.dev_password}` });
+            toast({ title: 'Trainer criado!', description: `Credenciais de acesso enviadas para ${form.email}.` });
             setDialogOpen(false);
             setForm(emptyForm);
             loadTrainers();

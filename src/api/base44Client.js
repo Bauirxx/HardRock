@@ -486,6 +486,40 @@ export const base44 = {
             }
             return mapClient(result);
         },
+        // Cria um personal trainer: conta de acesso (role personal_trainer) +
+        // perfil PT ligado a essa conta + email com as credenciais.
+        createTrainer: async (data) => {
+            const nome = data.full_name || data.nome || (data.email ? data.email.split('@')[0] : 'Trainer');
+            const tempPassword = gerarPasswordTemporaria();
+            const user = await request(`${API_URL}/auth/users`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    nome,
+                    email: data.email,
+                    password: tempPassword,
+                    perfil: 'USUARIO_NORMAL',
+                    role: 'personal_trainer',
+                    telefone: data.telefone || null,
+                    foto_url: data.foto_url || null,
+                    especialidade: data.especialidade || null,
+                    bio: data.bio || null,
+                    disponibilidade: data.disponibilidade || null,
+                    enviar_credenciais: true,
+                }),
+            });
+            const pt = await request(`${API_URL}/personal-trainers`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    utilizador_id: user.id,
+                    nome,
+                    especialidades: data.especialidade ? [data.especialidade] : [],
+                    bio: data.bio || null,
+                    foto: data.foto_url || null,
+                    telefone: data.telefone || null,
+                }),
+            });
+            return mapTrainer(pt);
+        },
         resetPassword: async (userId, newPassword) => {
             return await request(`${API_URL}/auth/users/${userId}`, {
                 method: 'PUT', body: JSON.stringify({ password: newPassword }),
@@ -598,6 +632,19 @@ export const base44 = {
         },
         markRead: async (id) => request(`${API_URL}/notificacoes/${id}/lida`, { method: 'PATCH' }),
         delete: async (id) => request(`${API_URL}/notificacoes/${id}`, { method: 'DELETE' }),
+    },
+    trainers: {
+        // Perfil de PT do utilizador autenticado (null se não for trainer)
+        me: async () => {
+            const data = await request(`${API_URL}/personal-trainers/me`);
+            return data ? mapTrainer(data) : null;
+        },
+        // Alunos atribuídos a um personal trainer
+        students: async (ptId) => {
+            const data = await request(`${API_URL}/clientes/por-trainer/${ptId}`);
+            const arr = Array.isArray(data) ? data : (data?.content || []);
+            return arr.map(mapClient);
+        },
     },
     users: {
         changePassword: async (_currentPassword, newPassword) => {

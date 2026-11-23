@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -26,6 +27,21 @@ public class PersonalTrainerController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PersonalTrainerDTO>>> listar(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.sucesso(ptService.listarTodos(pageable)));
+    }
+
+    // Perfil de PT do utilizador autenticado (o trainer vê o seu próprio perfil/alunos)
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<PersonalTrainerDTO>> meu(Authentication auth) {
+        if (auth == null || auth.getDetails() == null) {
+            return ResponseEntity.ok(ApiResponse.sucesso(null));
+        }
+        UUID userId;
+        try {
+            userId = UUID.fromString(auth.getDetails().toString());
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.sucesso(null));
+        }
+        return ResponseEntity.ok(ApiResponse.sucesso(ptService.buscarPorUtilizador(userId)));
     }
 
     @GetMapping("/{id}")

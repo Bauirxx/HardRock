@@ -34,6 +34,12 @@ public class ClienteController {
         return ResponseEntity.ok(ApiResponse.sucesso(result));
     }
 
+    // Alunos atribuídos a um personal trainer (usado pelo dashboard do trainer)
+    @GetMapping("/por-trainer/{ptId}")
+    public ResponseEntity<ApiResponse<java.util.List<ClienteDTO>>> porTrainer(@PathVariable UUID ptId) {
+        return ResponseEntity.ok(ApiResponse.sucesso(clienteService.listarPorTrainer(ptId)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ClienteDTO>> buscar(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.sucesso(clienteService.buscarPorId(id)));

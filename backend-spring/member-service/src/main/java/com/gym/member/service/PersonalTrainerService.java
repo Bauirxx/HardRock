@@ -39,6 +39,13 @@ public class PersonalTrainerService {
         return PersonalTrainerDTO.from(pt, count);
     }
 
+    // Perfil de PT da conta de utilizador autenticada (ou null se não for trainer)
+    public PersonalTrainerDTO buscarPorUtilizador(UUID utilizadorId) {
+        return ptRepository.findByUtilizadorId(utilizadorId)
+                .map(pt -> PersonalTrainerDTO.from(pt, clienteRepository.countByPersonalTrainerIdAndActivoTrue(pt.getId())))
+                .orElse(null);
+    }
+
     @Transactional
     public PersonalTrainerDTO criar(CreatePersonalTrainerDTO dto) {
         if (ptRepository.findByUtilizadorId(dto.utilizadorId()).isPresent()) {

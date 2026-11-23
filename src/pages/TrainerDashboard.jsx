@@ -50,21 +50,35 @@ function TrainerDashboardContent() {
     const loadData = async () => {
         const me = await base44.auth.me();
         setUser(me);
+
+        // Resolver o perfil de Personal Trainer desta conta (o id do PT difere do id do user)
+        const ptPerfil = await base44.trainers.me().catch(() => null);
+        const ptId = ptPerfil?.id;
+
         const [sess, subs] = await Promise.all([
             base44.sessions.list({ trainer_id: me.id }).catch(() => []),
-            base44.subscriptions.list({ trainer_id: me.id }).catch(() => []),
+            ptId ? base44.subscriptions.list({ trainer_id: ptId }).catch(() => []) : Promise.resolve([]),
         ]);
         setSessions(sess);
         setSubscriptions(subs);
 
-        const clientIds = new Set([
+        // Alunos atribuídos ao trainer (clientes com personal_trainer_id = ptId)
+        let alunos = [];
+        if (ptId) {
+            alunos = await base44.trainers.students(ptId).catch(() => []);
+        }
+        // Completar com clientes referidos em sessões/subscrições (compatibilidade)
+        const extraIds = new Set([
             ...sess.map(s => s.client).filter(Boolean),
             ...subs.map(s => s.client).filter(Boolean),
         ]);
-        if (clientIds.size > 0) {
+        const jaTem = new Set(alunos.map(c => c.id));
+        const faltam = [...extraIds].filter(id => !jaTem.has(id));
+        if (faltam.length > 0) {
             const allClients = await base44.entities.Client.list('-created_date', 200).catch(() => []);
-            setClients(allClients.filter(c => clientIds.has(c.id)));
+            alunos = [...alunos, ...allClients.filter(c => faltam.includes(c.id))];
         }
+        setClients(alunos);
     };
 
     const sessionsForDate = sessions.filter(s => s.data === selectedDate);
