@@ -21,6 +21,11 @@ public class SolicitacaoInscricaoEntity extends BaseEntity {
     @Column(name = "plano_pretendido", length = 120)
     private String planoPretendido;
 
+    @Column(length = 15)
+    private String sexo;
+
+    private Integer idade;
+
     @Column(columnDefinition = "TEXT")
     private String mensagem;
 
@@ -43,6 +48,10 @@ public class SolicitacaoInscricaoEntity extends BaseEntity {
     public void setEmail(String email) { this.email = email; }
     public String getPlanoPretendido() { return planoPretendido; }
     public void setPlanoPretendido(String planoPretendido) { this.planoPretendido = planoPretendido; }
+    public String getSexo() { return sexo; }
+    public void setSexo(String sexo) { this.sexo = sexo; }
+    public Integer getIdade() { return idade; }
+    public void setIdade(Integer idade) { this.idade = idade; }
     public String getMensagem() { return mensagem; }
     public void setMensagem(String mensagem) { this.mensagem = mensagem; }
     public String getStatus() { return status; }

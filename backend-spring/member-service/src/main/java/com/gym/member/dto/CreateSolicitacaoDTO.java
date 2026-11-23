@@ -22,6 +22,11 @@ public record CreateSolicitacaoDTO(
     @Size(max = 120)
     String planoPretendido,
 
+    @Size(max = 15)
+    String sexo,
+
+    Integer idade,
+
     @Size(max = 2000, message = "Mensagem demasiado longa")
     String mensagem
 ) {}

@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 
 export default function GinasioInscricaoPage() {
-    const [form, setForm] = useState({ nome: '', telefone: '', email: '', planoPretendido: '', mensagem: '' });
+    const [form, setForm] = useState({ nome: '', telefone: '', email: '', sexo: '', idade: '', planoPretendido: '', mensagem: '' });
     const [planos, setPlanos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [enviado, setEnviado] = useState(false);
@@ -34,7 +34,10 @@ export default function GinasioInscricaoPage() {
         }
         setLoading(true);
         try {
-            await base44.entities.GymApplication.create(form);
+            await base44.entities.GymApplication.create({
+                ...form,
+                idade: form.idade ? parseInt(form.idade) : null,
+            });
             setEnviado(true);
         } catch (err) {
             toast({ variant: 'destructive', title: 'Erro', description: err.message });
@@ -113,6 +116,24 @@ export default function GinasioInscricaoPage() {
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                     <Input type="email" className="pl-10" placeholder="seu.email@example.com" value={form.email}
                                         onChange={e => setForm({ ...form, email: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Sexo</Label>
+                                    <select className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                                        value={form.sexo} onChange={e => setForm({ ...form, sexo: e.target.value })}>
+                                        <option value="">Selecione</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Feminino">Feminino</option>
+                                        <option value="Outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Idade</Label>
+                                    <Input type="number" min="14" max="120" placeholder="18" value={form.idade}
+                                        onChange={e => setForm({ ...form, idade: e.target.value })} />
                                 </div>
                             </div>
 

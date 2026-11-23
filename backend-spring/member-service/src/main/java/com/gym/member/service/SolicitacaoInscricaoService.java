@@ -59,6 +59,8 @@ public class SolicitacaoInscricaoService {
         s.setTelefone(dto.telefone());
         s.setEmail(dto.email());
         s.setPlanoPretendido(dto.planoPretendido());
+        s.setSexo(dto.sexo());
+        s.setIdade(dto.idade());
         s.setMensagem(dto.mensagem());
         s.setStatus("pendente");
         return SolicitacaoDTO.from(repository.save(s));
