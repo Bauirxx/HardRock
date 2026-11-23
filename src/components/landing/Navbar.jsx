@@ -44,18 +44,26 @@ export default function Navbar() {
         base44.auth.me().then(setAuthUser).catch(() => setAuthUser(null));
     }, []);
 
-    const links = [
+    const textClass = !scrolled ? 'text-white' : '';
+
+    // Marca contextual: Hard Rock no ginásio, LariusSport na loja (mesma app)
+    const noGinasio = location.pathname.startsWith('/ginasio');
+
+    // Navegação contextual: menu da loja vs menu do ginásio
+    const storeLinks = [
         { to: '/', label: 'Início' },
         { to: '/loja', label: 'Loja' },
         { to: '/ginasio', label: 'Ginásio' },
         { to: '/equipamentos', label: 'Equipamentos' },
         { to: '/rastreio', label: 'Rastreio' },
     ];
-
-    const textClass = !scrolled ? 'text-white' : '';
-
-    // Marca contextual: Hard Rock no ginásio, LariusSport na loja (mesma app)
-    const noGinasio = location.pathname.startsWith('/ginasio');
+    const gymLinks = [
+        { to: '/ginasio', label: 'Ginásio' },
+        { to: '/ginasio#planos', label: 'Planos' },
+        { to: '/ginasio/inscricao', label: 'Inscrever-me' },
+        { to: '/loja', label: 'Loja Online' },
+    ];
+    const links = noGinasio ? gymLinks : storeLinks;
 
     return (
         <nav

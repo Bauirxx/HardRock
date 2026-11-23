@@ -7,20 +7,40 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-const menuItems = [
-    { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin/clientes', icon: Users, label: 'Clientes' },
-    { to: '/admin/trainers', icon: Dumbbell, label: 'Personal Trainers' },
-    { to: '/admin/subscricoes', icon: CalendarCheck, label: 'Subscrições' },
-    { to: '/admin/servicos', icon: BadgeCheck, label: 'Planos & Serviços' },
-    { to: '/admin/produtos', icon: Package, label: 'Produtos' },
-    { to: '/admin/encomendas', icon: ShoppingCart, label: 'Encomendas' },
-    { to: '/admin/pagamentos', icon: CreditCard, label: 'Pagamentos' },
-    { to: '/admin/leads', icon: UserPlus, label: 'Leads' },
-    { to: '/admin/inscricoes', icon: ClipboardList, label: 'Pedidos Inscrição' },
-    { to: '/admin/depoimentos', icon: MessageSquare, label: 'Depoimentos' },
-    { to: '/admin/transformacoes', icon: Sparkles, label: 'Histórias de Sucesso' },
-    { to: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
+const menuSections = [
+    {
+        title: null,
+        items: [
+            { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+        ],
+    },
+    {
+        title: 'Ginásio',
+        items: [
+            { to: '/admin/clientes', icon: Users, label: 'Clientes' },
+            { to: '/admin/trainers', icon: Dumbbell, label: 'Personal Trainers' },
+            { to: '/admin/subscricoes', icon: CalendarCheck, label: 'Subscrições' },
+            { to: '/admin/servicos', icon: BadgeCheck, label: 'Planos & Serviços' },
+            { to: '/admin/inscricoes', icon: ClipboardList, label: 'Pedidos Inscrição' },
+            { to: '/admin/transformacoes', icon: Sparkles, label: 'Histórias de Sucesso' },
+        ],
+    },
+    {
+        title: 'Loja',
+        items: [
+            { to: '/admin/produtos', icon: Package, label: 'Produtos' },
+            { to: '/admin/encomendas', icon: ShoppingCart, label: 'Encomendas' },
+        ],
+    },
+    {
+        title: 'Geral',
+        items: [
+            { to: '/admin/pagamentos', icon: CreditCard, label: 'Pagamentos' },
+            { to: '/admin/leads', icon: UserPlus, label: 'Leads' },
+            { to: '/admin/depoimentos', icon: MessageSquare, label: 'Depoimentos' },
+            { to: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
+        ],
+    },
 ];
 
 export default function AdminSidebar({ collapsed, onToggle }) {
@@ -52,25 +72,37 @@ export default function AdminSidebar({ collapsed, onToggle }) {
             </div>
 
             <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
-                {menuItems.map(item => {
-                    const isActive = location.pathname === item.to ||
-                        (item.to !== '/admin' && location.pathname.startsWith(item.to));
-                    return (
-                        <Link key={item.to} to={item.to}>
-                            <Button
-                                variant="ghost"
-                                className={cn(
-                                    "w-full justify-start gap-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
-                                    isActive && "bg-sidebar-accent text-sidebar-foreground font-medium",
-                                    collapsed && "justify-center px-0"
-                                )}
-                            >
-                                <item.icon className="w-5 h-5 shrink-0" />
-                                {!collapsed && <span>{item.label}</span>}
-                            </Button>
-                        </Link>
-                    );
-                })}
+                {menuSections.map((section, si) => (
+                    <div key={si} className={si > 0 ? 'pt-3' : ''}>
+                        {section.title && !collapsed && (
+                            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                                {section.title}
+                            </p>
+                        )}
+                        {section.title && collapsed && si > 0 && (
+                            <div className="mx-2 my-2 border-t border-sidebar-border/50" />
+                        )}
+                        {section.items.map(item => {
+                            const isActive = location.pathname === item.to ||
+                                (item.to !== '/admin' && location.pathname.startsWith(item.to));
+                            return (
+                                <Link key={item.to} to={item.to}>
+                                    <Button
+                                        variant="ghost"
+                                        className={cn(
+                                            "w-full justify-start gap-3 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                                            isActive && "bg-sidebar-accent text-sidebar-foreground font-medium",
+                                            collapsed && "justify-center px-0"
+                                        )}
+                                    >
+                                        <item.icon className="w-5 h-5 shrink-0" />
+                                        {!collapsed && <span>{item.label}</span>}
+                                    </Button>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                ))}
             </nav>
 
             <div className="p-2 border-t border-sidebar-border">
