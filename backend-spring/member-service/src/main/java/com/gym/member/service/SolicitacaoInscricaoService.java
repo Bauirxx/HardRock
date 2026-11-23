@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,8 @@ import java.util.UUID;
 public class SolicitacaoInscricaoService {
 
     private static final Set<String> ESTADOS = Set.of("pendente", "aprovado", "rejeitado");
+    // Um pedido "activo" (pendente ou já aprovado) bloqueia novos pedidos do mesmo contacto
+    private static final List<String> BLOQUEADORES = List.of("pendente", "aprovado");
 
     private final SolicitacaoInscricaoRepository repository;
 
@@ -40,6 +43,17 @@ public class SolicitacaoInscricaoService {
     // Submissão pública — cria sempre como pendente, nunca activa um membro directamente
     @Transactional
     public SolicitacaoDTO criar(CreateSolicitacaoDTO dto) {
+        // Impedir pedidos duplicados do mesmo contacto, exceto se o anterior foi rejeitado
+        String email = dto.email() != null ? dto.email().trim() : null;
+        if (email != null && !email.isBlank()
+                && repository.existsByEmailIgnoreCaseAndStatusInAndActivoTrue(email, BLOQUEADORES)) {
+            throw new BusinessException("Já existe um pedido de inscrição com este email. Aguarda o contacto da nossa equipa.", HttpStatus.CONFLICT);
+        }
+        if (dto.telefone() != null && !dto.telefone().isBlank()
+                && repository.existsByTelefoneAndStatusInAndActivoTrue(dto.telefone().trim(), BLOQUEADORES)) {
+            throw new BusinessException("Já existe um pedido de inscrição com este telefone. Aguarda o contacto da nossa equipa.", HttpStatus.CONFLICT);
+        }
+
         SolicitacaoInscricaoEntity s = new SolicitacaoInscricaoEntity();
         s.setNome(dto.nome());
         s.setTelefone(dto.telefone());
