@@ -47,6 +47,28 @@ export default function AdminInscricoes() {
         }
     };
 
+    // Aprovar E inscrever: cria o membro a partir do pedido (dispara o email de
+    // credenciais se houver email) e marca o pedido como aprovado. Fecha o ciclo.
+    const aprovarEInscrever = async (s) => {
+        try {
+            await base44.admin.createInternalClient({
+                full_name: s.nome,
+                telefone: s.telefone,
+                email: s.email,
+            });
+            await base44.entities.GymApplication.update(s.id, { status: 'aprovado' });
+            toast({
+                title: 'Membro inscrito',
+                description: s.email
+                    ? `${s.nome} foi inscrito e recebeu as credenciais por email.`
+                    : `${s.nome} foi inscrito. (Sem email — credenciais não enviadas.)`,
+            });
+            loadData();
+        } catch (e) {
+            toast({ variant: 'destructive', title: 'Erro ao inscrever', description: e.message });
+        }
+    };
+
     const handleDelete = async (id) => {
         try {
             await base44.entities.GymApplication.delete(id);
@@ -98,8 +120,8 @@ export default function AdminInscricoes() {
                                 </div>
                                 <div className="flex flex-col gap-1 shrink-0">
                                     {s.status !== 'aprovado' && (
-                                        <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => mudarEstado(s.id, 'aprovado')}>
-                                            <Check className="w-4 h-4" /> Aprovar
+                                        <Button size="sm" className="gap-1 bg-green-600 hover:bg-green-700" onClick={() => aprovarEInscrever(s)}>
+                                            <Check className="w-4 h-4" /> Aprovar e inscrever
                                         </Button>
                                     )}
                                     {s.status !== 'rejeitado' && (
