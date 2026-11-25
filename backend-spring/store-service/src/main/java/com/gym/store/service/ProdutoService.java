@@ -22,16 +22,17 @@ public class ProdutoService {
         this.produtoRepository = produtoRepository;
     }
 
-    public Page<ProdutoDTO> listarCatalogo(CategoriaProduto categoria, Pageable pageable) {
+    public Page<ProdutoListDTO> listarCatalogo(CategoriaProduto categoria, Pageable pageable) {
         if (categoria != null) {
             return produtoRepository.findByCategoriaAndActivoTrueAndStockGreaterThan(categoria, 0, pageable)
-                    .map(ProdutoDTO::from);
+                    .map(ProdutoListDTO::from);
         }
-        return produtoRepository.findByActivoTrueAndStockGreaterThan(0, pageable).map(ProdutoDTO::from);
+        return produtoRepository.findByActivoTrueAndStockGreaterThan(0, pageable).map(ProdutoListDTO::from);
     }
 
-    public Page<ProdutoDTO> listarTodos(Pageable pageable) {
-        return produtoRepository.findByActivoTrue(pageable).map(ProdutoDTO::from);
+    // Lista para o admin: TODOS os produtos activos (inclui stock 0, ex: máquinas sob consulta)
+    public Page<ProdutoListDTO> listarTodos(Pageable pageable) {
+        return produtoRepository.findByActivoTrue(pageable).map(ProdutoListDTO::from);
     }
 
     public ProdutoDTO buscarPorId(UUID id) {

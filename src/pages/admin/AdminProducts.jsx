@@ -35,7 +35,8 @@ export default function AdminProducts() {
     useEffect(() => { loadProducts(); }, []);
 
     const loadProducts = async () => {
-        const data = await base44.entities.Product.list('-created_date', 100);
+        // Endpoint admin: mostra TODOS os produtos (inclui stock 0, ex: máquinas)
+        const data = await base44.admin.listProducts(300).catch(() => base44.entities.Product.list('-created_date', 100));
         setProducts(data);
         setLoading(false);
     };

@@ -520,6 +520,11 @@ export const base44 = {
             });
             return mapTrainer(pt);
         },
+        // Lista de produtos para o admin (TODOS, inclui stock 0 — ex: máquinas)
+        listProducts: async (size = 300) => {
+            const data = await request(`${API_URL}/produtos/admin?page=0&size=${size}&sort=dataCriacao,desc`);
+            return unwrapPage(data, mapProduct);
+        },
         resetPassword: async (userId, newPassword) => {
             return await request(`${API_URL}/auth/users/${userId}`, {
                 method: 'PUT', body: JSON.stringify({ password: newPassword }),

@@ -24,14 +24,14 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ProdutoDTO>>> catalogo(
+    public ResponseEntity<ApiResponse<Page<ProdutoListDTO>>> catalogo(
             @RequestParam(required = false) CategoriaProduto categoria, Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.sucesso(produtoService.listarCatalogo(categoria, pageable)));
     }
 
     @GetMapping("/admin")
     @PreAuthorize("hasAnyRole('DONO_DO_GINASIO', 'SUPER_USER')")
-    public ResponseEntity<ApiResponse<Page<ProdutoDTO>>> listarTodos(Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<ProdutoListDTO>>> listarTodos(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.sucesso(produtoService.listarTodos(pageable)));
     }
 
