@@ -520,6 +520,10 @@ export const base44 = {
             });
             return mapTrainer(pt);
         },
+        // Eliminação PERMANENTE de um cliente (irreversível)
+        deleteClientPermanent: async (clienteId) => {
+            return await request(`${API_URL}/clientes/${clienteId}/permanente`, { method: 'DELETE' });
+        },
         // Lista de produtos para o admin (TODOS, inclui stock 0 — ex: máquinas)
         listProducts: async (size = 300) => {
             const data = await request(`${API_URL}/produtos/admin?page=0&size=${size}&sort=dataCriacao,desc`);

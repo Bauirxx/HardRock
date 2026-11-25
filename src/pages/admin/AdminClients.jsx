@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Plus, Edit, Send, Copy, UserCheck, Star, ShieldAlert, Upload, X, CreditCard } from 'lucide-react';
+import { Search, Plus, Edit, Send, Copy, UserCheck, Star, ShieldAlert, Upload, X, CreditCard, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,10 +35,21 @@ export default function AdminClients() {
     const [inviteForm, setInviteForm] = useState({ email: '', role: 'internal_client' });
     const [inviteResult, setInviteResult] = useState(null);
     const [inviting, setInviting] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const { toast } = useToast();
     const navigate = useNavigate();
 
     useEffect(() => { loadClients(); loadExternalUsers(); }, []);
+
+    const handleDeletePermanent = async (id) => {
+        try {
+            await base44.admin.deleteClientPermanent(id);
+            toast({ title: 'Cliente eliminado permanentemente' });
+            loadClients();
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Erro', description: err.message });
+        }
+    };
 
     const loadClients = async () => {
         const data = await base44.entities.Client.list('-created_date', 100);
@@ -426,6 +438,11 @@ export default function AdminClients() {
                                                         className="h-9 w-9 text-muted-foreground hover:text-white hover:bg-muted" onClick={() => handleEdit(client)}>
                                                         <Edit className="w-4 h-4" />
                                                     </Button>
+                                                    <Button variant="ghost" size="icon" title="Eliminar permanentemente"
+                                                        className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-muted"
+                                                        onClick={() => setDeleteTarget({ id: client.id, label: client.nome })}>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -477,6 +494,25 @@ export default function AdminClients() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Eliminar cliente permanentemente?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Vais eliminar <strong>{deleteTarget?.label}</strong> de forma <strong>irreversível</strong>.
+                            Todos os dados da ficha serão apagados. Esta acção não pode ser revertida.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => { handleDeletePermanent(deleteTarget.id); setDeleteTarget(null); }}>
+                            Eliminar permanentemente
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

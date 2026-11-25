@@ -60,7 +60,8 @@ export default function Navbar() {
     const gymLinks = [
         { to: '/ginasio', label: 'Ginásio' },
         { to: '/ginasio#planos', label: 'Planos' },
-        { to: '/ginasio/inscricao', label: 'Inscrever-me' },
+        // "Inscrever-me" só para visitantes; quem já tem conta não precisa
+        ...(!authUser ? [{ to: '/ginasio/inscricao', label: 'Inscrever-me' }] : [{ to: '/cliente', label: 'Área do Membro' }]),
         { to: '/loja', label: 'Loja Online' },
     ];
     const links = noGinasio ? gymLinks : storeLinks;

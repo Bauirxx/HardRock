@@ -139,4 +139,14 @@ public class ClienteService {
 
         eventPublisher.publicar("CLIENTE_REMOVIDO", c.getId(), realizadoPor, anterior, null);
     }
+
+    // Eliminação PERMANENTE (irreversível) — remove o registo da base de dados
+    @Transactional
+    public void eliminarPermanente(UUID id, String realizadoPor) {
+        ClienteEntity c = clienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente", id));
+        ClienteDTO anterior = ClienteDTO.from(c);
+        clienteRepository.delete(c);
+        eventPublisher.publicar("CLIENTE_ELIMINADO", id, realizadoPor, anterior, null);
+    }
 }

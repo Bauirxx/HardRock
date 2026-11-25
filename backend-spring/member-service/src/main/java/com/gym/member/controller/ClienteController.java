@@ -70,4 +70,12 @@ public class ClienteController {
         clienteService.desactivar(id, auth.getName());
         return ResponseEntity.ok(ApiResponse.sucesso(null, "Cliente desactivado com sucesso"));
     }
+
+    // Eliminação permanente (irreversível)
+    @DeleteMapping("/{id}/permanente")
+    @PreAuthorize("hasAnyRole('DONO_DO_GINASIO', 'SUPER_USER')")
+    public ResponseEntity<ApiResponse<Void>> eliminarPermanente(@PathVariable UUID id, Authentication auth) {
+        clienteService.eliminarPermanente(id, auth.getName());
+        return ResponseEntity.ok(ApiResponse.sucesso(null, "Cliente eliminado permanentemente"));
+    }
 }

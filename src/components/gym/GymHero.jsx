@@ -16,6 +16,8 @@ export default function GymHero() {
         { valor: '24/7', rotulo: 'Acesso premium' },
     ]);
 
+    const autenticado = (() => { try { return !!localStorage.getItem('auth_token'); } catch { return false; } })();
+
     useEffect(() => {
         Promise.all([
             base44.entities.Trainer.list('-created_date', 100).catch(() => []),
@@ -75,13 +77,23 @@ export default function GymHero() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <Link to="/ginasio/inscricao">
-                            <Button size="lg" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl shadow-lg shadow-primary/30">
-                                <CalendarCheck className="w-5 h-5" />
-                                Quero inscrever-me
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
-                        </Link>
+                        {autenticado ? (
+                            <Link to="/cliente">
+                                <Button size="lg" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl shadow-lg shadow-primary/30">
+                                    <CalendarCheck className="w-5 h-5" />
+                                    Área do Membro
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Link to="/ginasio/inscricao">
+                                <Button size="lg" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl shadow-lg shadow-primary/30">
+                                    <CalendarCheck className="w-5 h-5" />
+                                    Quero inscrever-me
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </Link>
+                        )}
                         <a href="#planos">
                             <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 text-base h-14 px-8 rounded-xl border-white/25 text-white hover:bg-white/10 bg-transparent">
                                 <Dumbbell className="w-5 h-5" />
